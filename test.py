@@ -2,7 +2,7 @@
 import networkx as nx
 from macq.generate.pddl import StateEnumerator as SE
 
-se = SE(dom='grid.pddl', prob='grid_prob.pddl')
+se = SE(dom='data/pddl/grid.pddl', prob='data/pddl/grid_data.pddl')
 
 print(type(se))
 print(type(se.graph))
