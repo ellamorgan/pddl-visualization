@@ -1,0 +1,19 @@
+digraph{
+    labelloc="t"
+    label = "Legend";
+    rankdir=LR;
+    subgraph cluster {
+        label="";
+        k1l[shape=plaintext, style=solid, label="", width=0.1];
+        k1r[shape=plaintext, style=solid, label="", width=0.1];
+        k1l->k1r  [color="#83e070", label="Move"];
+
+        k2l[shape=plaintext, style=solid, label="", width=0.1];
+        k2r[shape=plaintext, style=solid, label="", width=0.1];
+        k2l->k2r  [color="#7b4af7", label="Pickup"];
+
+        k3l[shape=plaintext, style=solid, label="", width=0.1];
+        k3r[shape=plaintext, style=solid, label="", width=0.1];
+        k3l->k3r  [color="#4a81f7", label="Putdown"];
+    }
+}
