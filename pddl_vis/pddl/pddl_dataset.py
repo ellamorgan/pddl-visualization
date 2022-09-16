@@ -2,7 +2,7 @@ from typing import Callable
 from torch.utils.data.dataset import Dataset
 from macq.generate.pddl import Generator
 import math
-from vis_pddl.utils import get_combination
+from pddl_vis.utils import get_combination
 
 
 class PDDLDataset(Dataset):
