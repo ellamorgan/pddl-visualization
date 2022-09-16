@@ -2,11 +2,11 @@ from macq.generate.pddl import Generator
 from macq.trace import Step, Trace
 from macq.generate.pddl import StateEnumerator
 from tarski.search.operations import progress
-from visualize.pddl import GridVisualizer
+from vis_pddl.pddl import GridVisualizer
 import networkx as nx
 from PIL import Image
 from io import BytesIO
-import pydot
+
 
 
 domain_file = 'data/pddl/grid.pddl'
@@ -14,15 +14,15 @@ problem_file = 'data/pddl/grid_data.pddl'
 
 
 actions = ['(move node0-0 node0-1)',
-           '(move node0-1 node1-1)',
-           '(putdown node1-1 key0)',
-           '(move node1-1 node1-0)',
-           '(move node1-0 node0-0)',
-           '(move node0-0 node0-1)',
-           '(move node0-1 node1-1)',
-           '(pickup node1-1 key0)',
-           '(move node1-1 node1-0)',
-           ]
+        '(move node0-1 node1-1)',
+        '(putdown node1-1 key0)',
+        '(move node1-1 node1-0)',
+        '(move node1-0 node0-0)',
+        '(move node0-0 node0-1)',
+        '(move node0-1 node1-1)',
+        '(pickup node1-1 key0)',
+        '(move node1-1 node1-0)',
+        ]
 
 generator = Generator(dom=domain_file, prob=problem_file)
 vis = GridVisualizer(generator, square_width=50, div_width=1, door_width=6, key_size=15, robot_size=17)
@@ -78,7 +78,9 @@ macq_state = generator.tarski_state_to_macq(state)
 step = Step(macq_state, None, len(actions))
 trace.append(step)
 
-graph_imgs[0].save('results/gifs/graph.gif', save_all=True, append_images=graph_imgs[1:], duration=1000, loop=0)
+graph_path = 'results/gifs/graph.gif'
+print("Saving gif of graph at " + graph_path + "\n")
+graph_imgs[0].save(graph_path, save_all=True, append_images=graph_imgs[1:], duration=1000, loop=0)
 state_imgs = vis.visualize_trace(trace, size=(652,731))
 
 imgs = []
@@ -88,4 +90,7 @@ for graph, state in zip(graph_imgs, state_imgs):
     dst.paste(state, (0, 0))
     dst.paste(graph, (state.width, 0))
     imgs.append(dst)
-imgs[0].save('results/gifs/state_graph.gif', save_all=True, append_images=imgs[1:], duration=1000, loop=0)
+
+state_graph_path = 'results/gifs/state_graph.gif'
+print("Saving gif of state visualization and graph at " + state_graph_path + "\n")
+imgs[0].save(state_graph_path, save_all=True, append_images=imgs[1:], duration=1000, loop=0)

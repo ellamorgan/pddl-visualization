@@ -2,6 +2,6 @@ wandb/
 env/
 packages/
 **/__pycache__/
-**/data/__pycache__/
-**/vis/__pycache__/
+**/vis_pddl/__pycache__/
+**/tests/__pycache__/
 .vscode/

@@ -2,6 +2,8 @@ import networkx as nx
 from macq.generate.pddl import StateEnumerator as SE
 import pydot
 
+
+
 se = SE(dom='data/pddl/grid.pddl', prob='data/pddl/grid_data.pddl')
 
 # dot -Tpng graph.dot > graph.png
