@@ -1,8 +1,8 @@
 import os
-from vis_pddl.train_utils import load_args
+from pddl_vis.utils import load_args
 from torch.utils.data import DataLoader
 
-from vis_pddl.pddl import PDDLDataset
+from pddl_vis.pddl import PDDLDataset
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
