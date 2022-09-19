@@ -13,7 +13,7 @@ else:
 
 
 
-def load_args(n_states):
+def load_args(n_states: int):
     '''
     Taken from parse_args_pretrain() in solo.setup
     Needed to alter to not load in dataset/augmentation args
@@ -31,6 +31,10 @@ def load_args(n_states):
 
     # add model specific args
     parser = METHODS[temp_args.method].add_model_specific_args(parser)
+
+    # add pddl domain file and problem file args
+    parser.add_argument("--domain_file", type=str)
+    parser.add_argument("--problem_file", type=str)
 
     # add auto checkpoint/umap args
     parser.add_argument("--save_checkpoint", action="store_true")

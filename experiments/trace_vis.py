@@ -2,7 +2,7 @@ from macq.generate.pddl import Generator
 from macq.trace import Step, Trace
 from macq.generate.pddl import StateEnumerator
 from tarski.search.operations import progress
-from vis_pddl.pddl import GridVisualizer
+from pddl_vis.pddl import GridVisualizer
 import networkx as nx
 from PIL import Image
 from io import BytesIO

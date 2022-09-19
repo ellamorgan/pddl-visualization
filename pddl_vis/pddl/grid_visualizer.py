@@ -150,7 +150,7 @@ class GridVisualizer:
         return state_vis
 
 
-    def visualize_state(self, step, out_name=None, memory=False, format=None, size=None, lightscale=False):
+    def visualize_state(self, step, out_name=None, memory=False, format='numpy', size=None, lightscale=False):
 
         state = step.state
         action = step.action
@@ -178,7 +178,6 @@ class GridVisualizer:
                 elif fluent.name == 'at':
                     x, y = fluent.objects[1].name.split('-')
 
-                    #img = self.keys[fluent.objects[0].name]
                     img = self.sample_mnist(self.key_shapes[self.key_types[fluent.objects[0].name]], self.key_size)
 
                     self.place_obj(img, fluent.objects[0].name, (int(x[4:]), int(y)), state_vis, memory=memory)
@@ -212,7 +211,7 @@ class GridVisualizer:
             img_from_array.save(out_name)
 
         if format == 'numpy':
-            return np.array(img_from_array)
+            return np.array(img_from_array).transpose((2, 0, 1))
 
         return img_from_array
 

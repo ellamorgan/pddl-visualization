@@ -1,8 +1,6 @@
 import os
 from pddl_vis.utils import load_args
-from torch.utils.data import DataLoader
-
-from pddl_vis.pddl import PDDLDataset
+from pddl_vis.pddl import PDDLDataset, prepare_dataloader, GridVisualizer
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -14,19 +12,23 @@ from solo.methods import METHODS
 from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
 
+from macq.generate.pddl import StateEnumerator
+
 
 def main():
 
     # Closely resembles main_pretrain.py from solo-learn
 
-    args = load_args(image_size=32, n_states=20)
+    args = load_args(n_states=20)
 
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
 
-    # Need generator and need to wrap in dataloader...
-    # For the dataloader think I just need a collate_fn, should do what I want?
-    train_loader = PDDLDataset()
+    # This should be a function that gets the right visualization depending on the domain
+    generator = StateEnumerator(dom=args.domain_file, prob=args.problem_file)
+    vis = GridVisualizer(generator, square_width=50, div_width=1, door_width=6, key_size=15, robot_size=17)
+    dataset = PDDLDataset(generator, vis.visualize_state, n_samples=5, img_size=(24,24))
+    train_loader = prepare_dataloader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
 
     ckpt_path, wandb_run_id = None, None
     if args.auto_resume and args.resume_from_checkpoint is None:
