@@ -1,4 +1,4 @@
-from typing import Callable, Optional
+from typing import Callable, Optional, List
 from torch.utils.data.dataset import Dataset
 from torch.utils.data import DataLoader
 from macq.generate.pddl import StateEnumerator
@@ -18,15 +18,21 @@ class PDDLDataset(Dataset):
         n_samples: int,
         img_size: tuple,
         train: bool = True,
+        inds: List[int] = [],
     ) -> None:
 
-        self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes]
+        if len(inds) == 0:
+            self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes]
+        else:
+            self.states = [generator.tarski_state_to_macq(generator.graph.nodes[i]) for i in inds]
+            
         self.data = [[vis(Step(state, None, 0), size=img_size) for _ in range(n_samples)] for state in self.states]
         self.targets = list(range(len(self.data)))
         self.n_states = len(self.data)
         self.n_samples = n_samples
         self.n_pairs = math.comb(n_samples, 2)
         self.train = train
+        self.inds = inds
     
     def __getitem__(self, index):
         if self.train:
@@ -44,44 +50,6 @@ class PDDLDataset(Dataset):
     
     def __len__(self):
         return self.n_states * self.n_pairs
-
-
-
-class PDDLTrainDataset(Dataset):
-
-    def __init__(
-        self,
-        generator: StateEnumerator,
-        vis: Callable,
-        n_samples: int,
-        img_size: tuple,
-    ) -> None:
-
-        self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes]
-        self.data = [[vis(Step(state, None, 0), size=img_size) for _ in range(n_samples)] for state in self.states]
-        self.targets = list(range(len(self.data)))
-        self.n_states = len(self.data)
-        self.n_samples = n_samples
-        self.n_pairs = math.comb(n_samples, 2)
-    
-    def __getitem__(self, index):
-        if index >= self.n_states * self.n_pairs:
-            raise IndexError("Dataset index out of range")
-        state_ind = index // self.n_pairs
-        p1, p2 = get_combination(index % self.n_pairs, self.n_samples, self.n_pairs)
-        return index, self.data[state_ind][p1], self.data[state_ind][p2], state_ind
-    
-    def __len__(self):
-        return self.n_states * self.n_pairs
-
-
-class PDDLTestDataset(Dataset):
-
-    def __init__(
-        self,
-        generator: StateEnumerator,
-
-    )
 
 
 
