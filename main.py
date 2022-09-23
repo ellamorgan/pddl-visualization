@@ -1,6 +1,7 @@
 import os
 from pddl_vis.utils import load_args
-from pddl_vis.pddl import PDDLDataset, prepare_dataloader, GridVisualizer
+from pddl_vis.pddl import PDDLDataset, prepare_dataloader, get_domain
+from pddl_vis.pddl import VIS
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -24,11 +25,36 @@ def main():
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
 
-    # This should be a function that gets the right visualization depending on the domain
-    generator = StateEnumerator(dom=args.domain_file, prob=args.problem_file)
-    vis = GridVisualizer(generator, square_width=50, div_width=1, door_width=6, key_size=15, robot_size=17)
-    dataset = PDDLDataset(generator, vis.visualize_state, n_samples=5, img_size=(24,24))
-    train_loader = prepare_dataloader(dataset, batch_size=args.batch_size, num_workers=args.num_workers)
+    # Add these to args
+    vis_args = {
+        'square_width': 50,
+        'div_width': 1,
+        'door_width': 6,
+        'key_size': 15,
+        'robot_size': 17,
+    }
+
+    train_samples=10
+    val_samples=3
+    test_samples=3
+
+    generator, vis = get_domain(
+        domain_file=args.domain_file, 
+        problem_file=args.problem_file, 
+        vis_args=vis_args
+    )
+
+    train_data = PDDLDataset(generator, vis, n_samples=train_samples, img_size=(24,24))
+    val_data = PDDLDataset(generator, vis, n_samples=val_samples, img_size=(24,24), train=False)
+    test_data = PDDLDataset(generator, vis, n_samples=test_samples, img_size=(24,24), train=False)
+
+    train_loader, val_loader, test_loader = prepare_dataloader(
+        train_dataset=train_data, 
+        val_dataset=val_data, 
+        test_dataset=test_data, 
+        batch_size=args.batch_size, 
+        num_workers=args.num_workers
+    )
 
     ckpt_path, wandb_run_id = None, None
     if args.auto_resume and args.resume_from_checkpoint is None:

@@ -6,6 +6,7 @@ from macq.trace import Step
 import math
 import torch
 from pddl_vis.utils import get_combination
+from pddl_vis.pddl import VIS
 import numpy as np
 
 
@@ -53,13 +54,25 @@ class PDDLDataset(Dataset):
 
 
 
+def get_domain(domain_file, problem_file, vis_args):
+
+    name = domain_file.split('/')[-1].split('.')[0]
+    assert name in VIS.keys()
+
+    generator = StateEnumerator(dom=domain_file, prob=problem_file)
+    vis = VIS[name](generator, **vis_args).visualize_state
+
+    return generator, vis
+
+
+
 def prepare_dataloader(
     train_dataset: Dataset,
     val_dataset: Optional[Dataset] = None,
     test_dataset: Optional[Dataset] = None,
     batch_size: int = 64, 
     num_workers: int = 4,
-) -> DataLoader:
+) -> List[DataLoader]:
 
     def train_collate(data):
         '''
@@ -70,6 +83,11 @@ def prepare_dataloader(
         return data
     
     def test_collate(data):
+        '''
+        data: list where each element is [img, state_ind]
+        '''
+        data = list(zip(*data))
+        data = [torch.tensor(np.array(data[0])).float(), torch.tensor(data[1])]
         return data
 
     train_loader = DataLoader(
