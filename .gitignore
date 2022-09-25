@@ -3,6 +3,10 @@ env/
 packages/
 **/__pycache__/
 **/vis_pddl/__pycache__/
+**/vis_pddl/dataset/__pycache__/
+**/vis_pddl/testing/__pycache__/
+**/vis_pddl/utils/__pycache__/
+**/vis_pddl/visualizers/__pycache__/
 **/experiments/__pycache__/
 .vscode/
 trained_models/

@@ -2,7 +2,7 @@ python3 main.py \
     --domain_file data/pddl/grid.pddl \
     --problem_file data/pddl/grid_data.pddl \
     --backbone resnet18 \
-    --max_epochs 400 \
+    --max_epochs 10 \
     --devices 1 \
     --accelerator gpu \
     --strategy ddp \

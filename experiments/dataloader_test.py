@@ -1,4 +1,4 @@
-from pddl_vis.pddl import PDDLDataset, collate_fn, GridVisualizer
+from pddl_vis.visualizers import PDDLDataset, collate_fn, GridVisualizer
 from macq.generate.pddl import StateEnumerator
 from torch.utils.data import DataLoader
 

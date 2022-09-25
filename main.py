@@ -1,7 +1,6 @@
 import os
 from pddl_vis.utils import load_args
-from pddl_vis.pddl import PDDLDataset, prepare_dataloader, get_domain
-from pddl_vis.pddl import VIS
+from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -13,7 +12,6 @@ from solo.methods import METHODS
 from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
 
-from macq.generate.pddl import StateEnumerator
 
 
 def main():
@@ -110,10 +108,15 @@ def main():
         else args.strategy,
     )
 
-    trainer.fit(model, train_loader, ckpt_path=ckpt_path)
+    trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
+
+    for batch in test_loader:
+        print(batch.shape)
+        assn = model.get_assignments(batch)
+        print(assn.shape)
+
 
 
 if __name__ == '__main__':
 
-    # Doesn't run yet!
     main()
