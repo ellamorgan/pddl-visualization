@@ -56,7 +56,7 @@ class GridVisualizer:
         for atom in atoms:
             if atom.predicate.name == 'key-shape':
                 key_type = atom.subterms[1].name
-                img = self.sample_mnist(self.key_shapes[key_type], key_size)
+                img = self._sample_mnist(self.key_shapes[key_type], key_size)
                 key_dict[atom.subterms[0].name] = img
                 key_types[atom.subterms[0].name] = key_type
 
@@ -73,11 +73,11 @@ class GridVisualizer:
         self.div_w = div_width
         self.door_w = door_width
         self.key_size = key_size
-        self.board = self.generate_board()
+        self.board = self._generate_board()
         self.obj_pos = dict()
     
 
-    def sample_mnist(self, num, key_size):
+    def _sample_mnist(self, num, key_size):
         sample = random.choice(self.mnist_data[str(num)])
         sample = Image.fromarray(sample)
         sample = np.array(sample.resize((key_size, key_size)))[:, :, np.newaxis]
@@ -85,7 +85,7 @@ class GridVisualizer:
         return sample
 
     
-    def generate_board(self):
+    def _generate_board(self):
 
         board = np.zeros((self.square_w * self.width + self.div_w * (self.width + 1) + self.key_size, self.square_w * self.height + self.div_w * (self.height + 1), 3))
 
@@ -121,7 +121,7 @@ class GridVisualizer:
         return board
     
 
-    def place_obj(self, img, name, loc, state_vis, memory=True):
+    def _place_obj(self, img, name, loc, state_vis, memory=True):
 
         counter = 0
 
@@ -178,20 +178,20 @@ class GridVisualizer:
                 elif fluent.name == 'at':
                     x, y = fluent.objects[1].name.split('-')
 
-                    img = self.sample_mnist(self.key_shapes[self.key_types[fluent.objects[0].name]], self.key_size)
+                    img = self._sample_mnist(self.key_shapes[self.key_types[fluent.objects[0].name]], self.key_size)
 
-                    self.place_obj(img, fluent.objects[0].name, (int(x[4:]), int(y)), state_vis, memory=memory)
+                    self._place_obj(img, fluent.objects[0].name, (int(x[4:]), int(y)), state_vis, memory=memory)
 
                 elif fluent.name == 'at-robot':
                     x, y = fluent.objects[0].name.split('-')
                     robot_pos = (int(x[4:]), int(y))
                 
                 elif fluent.name == 'holding':
-                    img = self.sample_mnist(self.key_shapes[self.key_types[fluent.objects[0].name]], self.key_size)
+                    img = self._sample_mnist(self.key_shapes[self.key_types[fluent.objects[0].name]], self.key_size)
                     state_vis[-len(img):, 0: len(img), :] += img
         
         if len(robot_pos) > 0:
-            self.place_obj(self.robot_img, 'at-robot', robot_pos, state_vis, memory=memory)
+            self._place_obj(self.robot_img, 'at-robot', robot_pos, state_vis, memory=memory)
         
         if action is not None and memory:
             if action.name == 'pickup':
