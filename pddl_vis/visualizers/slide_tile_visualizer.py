@@ -20,7 +20,7 @@ class SlideTileVisualizer:
         Expect tiles to be formatted as t#, and coordinates formatted as x# and y#, where # is an integer
         '''
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
-        tile_w, tile_h, _ = self.sample_mnist(0).shape
+        tile_w, tile_h, _ = self._sample_mnist(0).shape
 
         atoms = generator.problem.init.as_atoms()
 
@@ -39,7 +39,7 @@ class SlideTileVisualizer:
 
         assert width * height < 10, "Sorry, support for puzzles with more than 10 tiles isn't supported yet"
 
-        self.imgs = [self.sample_mnist(i) for i in range(width * height)]
+        self.imgs = [self._sample_mnist(i) for i in range(width * height)]
         self.width = width
         self.height = height
         self.tile_w = tile_w
@@ -48,7 +48,7 @@ class SlideTileVisualizer:
     
 
 
-    def sample_mnist(
+    def _sample_mnist(
         self, 
         num: int,
     ) -> np.ndarray:
@@ -85,7 +85,7 @@ class SlideTileVisualizer:
                     if memory:
                         img = self.imgs[t]
                     else:
-                        img = self.sample_mnist(t)
+                        img = self._sample_mnist(t)
                     state_vis[(w - 1) * self.tile_w : w * self.tile_w, (h - 1) * self.tile_h : h * self.tile_h] = img
         
         img = Img.fromarray(state_vis.astype('uint8'), 'RGB')

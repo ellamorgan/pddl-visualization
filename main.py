@@ -12,6 +12,8 @@ from solo.methods import METHODS
 from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
 
+from experiments.val_vis_test import predict_vis_trace
+
 
 
 def main():
@@ -111,9 +113,7 @@ def main():
     trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
     for batch in test_loader:
-        print(batch.shape)
-        assn = model.get_assignments(batch)
-        print(assn.shape)
+        predict_vis_trace(batch, generator, model)
 
 
 

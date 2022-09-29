@@ -19,7 +19,7 @@ class PDDLDataset(Dataset):
     ) -> None:
 
         if len(inds) == 0:
-            self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes]
+            self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes()]
         else:
             self.states = [generator.tarski_state_to_macq(generator.graph.nodes[i]) for i in inds]
             
