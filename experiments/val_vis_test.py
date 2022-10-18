@@ -5,6 +5,39 @@ import torch
 import numpy as np
 
 
+actions = ['(putdown node0-0 key0)',
+            '(move node0-0 node0-1)',
+            '(move node0-1 node1-1)',
+            '(move node1-1 node1-0)',
+            '(move node1-0 node0-0)',
+            '(pickup node0-0 key0)',
+            '(move node0-0 node0-1)',
+
+            '(putdown node0-1 key0)',
+            '(move node0-1 node1-1)',
+            '(move node1-1 node1-0)',
+            '(move node1-0 node0-0)',
+            '(move node0-0 node0-1)',
+            '(pickup node0-1 key0)',
+            '(move node0-1 node1-1)',
+            
+            '(putdown node1-1 key0)',
+            '(move node1-1 node1-0)',
+            '(move node1-0 node0-0)',
+            '(move node0-0 node0-1)',
+            '(move node0-1 node1-1)',
+            '(pickup node1-1 key0)',
+            '(move node1-1 node1-0)',
+            
+            '(putdown node1-0 key0)',
+            '(move node1-0 node0-0)',
+            '(move node0-0 node0-1)',
+            '(move node0-1 node1-1)',
+            '(move node1-1 node1-0)',
+            '(pickup node1-0 key0)',
+            '(move node1-0 node0-0)',]
+
+
 def predict_vis_trace(batch, generator, model):
 
     with torch.no_grad():
