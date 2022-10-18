@@ -42,6 +42,10 @@ def predict_vis_trace(batch, generator, model):
 
         pred = np.array(list(map(np.argmax, logits)))
 
+        trace_imgs = []
+        for node in pred:
+            trace_imgs.append(colour_state(node, state_graph))
+
         print(pred)
         print(targets)
         exit()

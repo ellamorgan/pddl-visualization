@@ -2,7 +2,7 @@ python3 main.py \
     --domain_file data/pddl/grid.pddl \
     --problem_file data/pddl/grid_data.pddl \
     --backbone resnet18 \
-    --max_epochs 10 \
+    --max_epochs 5 \
     --devices 1 \
     --accelerator gpu \
     --strategy ddp \
@@ -13,6 +13,7 @@ python3 main.py \
     --eta_lars 0.02 \
     --exclude_bias_n_norm_lars \
     --scheduler warmup_cosine \
+    --scheduler_interval epoch \
     --lr 0.6 \
     --min_lr 0.0006 \
     --classifier_lr 0.1 \
