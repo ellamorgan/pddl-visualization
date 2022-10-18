@@ -34,7 +34,7 @@ def main():
         'robot_size': 17,
     }
 
-    train_samples=10
+    train_samples=20
     val_samples=3
     test_samples=3
 
