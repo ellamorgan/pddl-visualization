@@ -34,9 +34,10 @@ def main():
         'robot_size': 17,
     }
 
-    train_samples=20
+    train_samples=30
     val_samples=3
     test_samples=3
+    img_size=(48, 48)
 
     generator, vis = get_domain(
         domain_file=args.domain_file, 
@@ -44,9 +45,9 @@ def main():
         vis_args=vis_args
     )
 
-    train_data = PDDLDataset(generator, vis, n_samples=train_samples, img_size=(24,24))
-    val_data = PDDLDataset(generator, vis, n_samples=val_samples, img_size=(24,24), train=False)
-    test_data = PDDLDataset(generator, vis, n_samples=test_samples, img_size=(24,24), train=False)
+    train_data = PDDLDataset(generator, vis, n_samples=train_samples, img_size=img_size)
+    val_data = PDDLDataset(generator, vis, n_samples=val_samples, img_size=img_size, train=False)
+    test_data = PDDLDataset(generator, vis, n_samples=test_samples, img_size=img_size, train=False)
 
     train_loader, val_loader, test_loader = prepare_dataloader(
         train_dataset=train_data, 
@@ -55,6 +56,14 @@ def main():
         batch_size=args.batch_size, 
         num_workers=args.num_workers
     )
+
+    batch = next(iter(val_loader))
+    print(type(batch))
+    print(batch[0].shape)
+    print(batch[1].shape)
+    #print(batch[0].shape)
+    #print(batch[1])
+    exit()
 
     ckpt_path, wandb_run_id = None, None
     if args.auto_resume and args.resume_from_checkpoint is None:

@@ -2,7 +2,7 @@ python3 main.py \
     --domain_file data/pddl/grid.pddl \
     --problem_file data/pddl/grid_data.pddl \
     --backbone resnet18 \
-    --max_epochs 5 \
+    --max_epochs 2 \
     --devices 1 \
     --accelerator gpu \
     --strategy ddp \
@@ -18,7 +18,7 @@ python3 main.py \
     --min_lr 0.0006 \
     --classifier_lr 0.1 \
     --weight_decay 1e-6 \
-    --batch_size 5 \
+    --batch_size 50 \
     --num_workers 4 \
     --name swav \
     --project solo-learn \

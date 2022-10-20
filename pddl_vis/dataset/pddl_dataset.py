@@ -3,6 +3,7 @@ from torch.utils.data.dataset import Dataset
 from macq.generate.pddl import StateEnumerator
 from macq.trace import Step
 import math
+import numpy as np
 from pddl_vis.utils import get_combination
 
 
@@ -22,8 +23,11 @@ class PDDLDataset(Dataset):
             self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes()]
         else:
             self.states = [generator.tarski_state_to_macq(generator.graph.nodes[i]) for i in inds]
+
+        def preprocess(img):
+            return (np.array(img).transpose((2, 0, 1)) / 127.5) - 1
             
-        self.data = [[vis(Step(state, None, 0), size=img_size) for _ in range(n_samples)] for state in self.states]
+        self.data = [[preprocess(vis(Step(state, None, 0), size=img_size)) for _ in range(n_samples)] for state in self.states]
         self.targets = list(range(len(self.data)))
         self.n_states = len(self.data)
         self.n_samples = n_samples

@@ -67,7 +67,6 @@ class SlideTileVisualizer:
         memory: bool = False, 
         size: Union[Tuple[int, int], None] = None, 
         lightscale: bool = False,
-        as_image: bool = False,
     ) -> Union[np.ndarray, Image]:
 
         if isinstance(state, Step):
@@ -99,10 +98,7 @@ class SlideTileVisualizer:
         if out_path is not None:
             img.save(out_path)
 
-        if as_image:
-            return img
-
-        return np.array(img).transpose((2, 0, 1))
+        return img
     
 
 
@@ -116,7 +112,7 @@ class SlideTileVisualizer:
 
         imgs = []
         for step in trace:
-            imgs.append(self.visualize_state(step, memory=True, size=size, as_image=True))
+            imgs.append(self.visualize_state(step, memory=True, size=size))
             
         if out_path is not None:
             imgs[0].save(out_path, save_all=True, append_images=imgs[1:], duration=duration, loop=0)

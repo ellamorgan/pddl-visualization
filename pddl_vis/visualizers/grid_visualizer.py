@@ -210,7 +210,7 @@ class GridVisualizer:
         if out_name is not None:
             img_from_array.save(out_name)
 
-        return np.array(img_from_array).transpose((2, 0, 1))
+        return img_from_array
 
 
     def visualize_trace(self, trace, out_path=None, duration=1000, size=None):
