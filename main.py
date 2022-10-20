@@ -13,6 +13,7 @@ from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
 
 from experiments.val_vis_test import predict_vis_trace
+from experiments.edge_weights import learn_edges
 
 
 
@@ -20,7 +21,9 @@ def main():
 
     # Closely resembles main_pretrain.py from solo-learn
 
-    args = load_args(n_states=20)
+    #n_states=20
+    n_states = 42
+    args = load_args(n_states=n_states)
 
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
@@ -57,13 +60,6 @@ def main():
         num_workers=args.num_workers
     )
 
-    batch = next(iter(val_loader))
-    print(type(batch))
-    print(batch[0].shape)
-    print(batch[1].shape)
-    #print(batch[0].shape)
-    #print(batch[1])
-    exit()
 
     ckpt_path, wandb_run_id = None, None
     if args.auto_resume and args.resume_from_checkpoint is None:
@@ -121,8 +117,12 @@ def main():
 
     trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
+    '''
     for batch in test_loader:
         predict_vis_trace(batch, generator, model)
+    '''
+    
+    learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states)
 
 
 
