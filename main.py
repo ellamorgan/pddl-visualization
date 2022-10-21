@@ -22,7 +22,7 @@ def main():
     # Closely resembles main_pretrain.py from solo-learn
 
     #n_states=20
-    n_states = 42
+    n_states = 90
     args = load_args(n_states=n_states)
 
     model = METHODS[args.method](**args.__dict__)
