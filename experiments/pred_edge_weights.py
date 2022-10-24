@@ -1,8 +1,10 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.data import DataLoader
 import numpy as np
 import random
+from macq.trace import Step
 
 # edge_weights.py generates the data - index of two nodes and edge weights
 # we need to generate examples of each node, and pass them into a network that should predict the weight
@@ -36,7 +38,7 @@ def process_img(img, size):
         return normalized
 
 
-def train_edge_network(data, model, vis, n_samples, states, img_size):
+def train_edge_network(data, embedding_model, vis, n_samples, states, img_size, batch_size, epochs):
 
     train_split = 0.8
     val_split = 0.1
@@ -48,8 +50,8 @@ def train_edge_network(data, model, vis, n_samples, states, img_size):
     for i, j, w in data:
         state = []
         for _ in range(n_samples):
-            img1 = process_img(vis(states[i]), img_size)
-            img2 = process_img(vis(states[j]), img_size)
+            img1 = process_img(vis(Step(states[i], None, 0)), img_size)
+            img2 = process_img(vis(Step(states[j], None, 0)), img_size)
             state.append([img1, img2])
         targets.append(w)
         dataset.append(state)
@@ -63,15 +65,32 @@ def train_edge_network(data, model, vis, n_samples, states, img_size):
     val_inds = inds[int(train_split * len(dataset)) : int((train_split + val_split) * len(dataset))]
     test_inds = inds[int((train_split + val_split) * len(dataset)):]
 
-    train_data = torch.tensor(dataset[train_inds]).float()
-    train_target = torch.tensor(targets[train_inds]).float()
-    val_data = torch.tensor(dataset[val_inds]).float()
-    val_target = torch.tensor(targets[val_inds]).float()
-    test_data = torch.tensor(dataset[test_inds]).float()
-    test_target = torch.tensor(targets[test_inds]).float()
-
-
-    # dataset: (n_states x n_states, n_samples, 3, img_w, img_h)
+    # dataset: (n_states x n_states, n_samples, 2, 3, img_w, img_h)
     # targets: (n_states x n_states)
-    print(dataset.shape)
-    print(targets.shape)
+    def get_inds(data, target, inds):
+        data = data[inds]
+        target = target[inds]
+        data = data.reshape((-1, *data.shape[2:]))
+        target = target[:, np.newaxis].repeat(n_samples, axis=1).flatten()
+        return torch.tensor(data).float(), torch.tensor(target).float()
+
+    train_data, train_target = get_inds(dataset, targets, train_inds)
+    val_data, val_target = get_inds(dataset, targets, val_inds)
+    test_data, test_target = get_inds(dataset, targets, test_inds)
+
+    print("Train data:", train_data.shape, "Training target:", train_target.shape)
+    print("Val data:", val_data.shape, "Val target:", val_target.shape)
+    print("Test data:", test_data.shape, "Test target:", test_target.shape)
+
+    train_dataloader = DataLoader([train_data, train_target], batch_size=batch_size, pin_memory=True)
+    val_dataloader = DataLoader([val_data, val_target], batch_size=batch_size, pin_memory=True)
+    test_dataloader = DataLoader([test_data, test_target], batch_size=batch_size, pin_memory=True)
+
+    for epoch in range(epochs):
+        for batch in train_dataloader:
+
+            x, target = batch
+            print(x.shape)
+            print(target.shape)
+            exit()
+

@@ -14,6 +14,7 @@ from solo.utils.checkpointer import Checkpointer
 
 from experiments.val_vis_test import predict_vis_trace
 from experiments.edge_weights import learn_edges
+from experiments.pred_edge_weights import train_edge_network
 
 
 
@@ -25,6 +26,7 @@ def main():
     n_states = 90
     args = load_args(n_states=n_states)
 
+    #model = METHODS[args.method].load_from_checkpoint("trained_models/swav/solo-learn/2ev6njzg/checkpoints/epoch=1-step=1566.ckpt", **args.__dict__)
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
 
@@ -60,8 +62,8 @@ def main():
         num_workers=args.num_workers
     )
 
-
-    ckpt_path, wandb_run_id = None, None
+    wandb_run_id = None
+    '''
     if args.auto_resume and args.resume_from_checkpoint is None:
         auto_resumer = AutoResumer(
             checkpoint_dir=os.path.join(args.checkpoint_dir, args.method),
@@ -77,9 +79,11 @@ def main():
     elif args.resume_from_checkpoint is not None:
         ckpt_path = args.resume_from_checkpoint
         del args.resume_from_checkpoint
+    '''
 
     callbacks = []
 
+    '''
     if args.save_checkpoint:
         # save checkpoint on last epoch only
         ckpt = Checkpointer(
@@ -88,6 +92,7 @@ def main():
             frequency=args.checkpoint_frequency,
         )
         callbacks.append(ckpt)
+    '''
     
     # wandb logging
     if args.wandb:
@@ -109,21 +114,21 @@ def main():
         args,
         logger=wandb_logger if args.wandb else None,
         callbacks=callbacks,
-        enable_checkpointing=False,
+        default_root_dir='trained_models/swav',
         strategy=DDPStrategy(find_unused_parameters=False)
         if args.strategy == "ddp"
         else args.strategy,
     )
 
-    trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
+    trainer.fit(model, train_loader, val_loader)
 
     '''
     for batch in test_loader:
         predict_vis_trace(batch, generator, model)
     '''
     
-    learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states)
-
+    edge_dataset, states = learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
+    train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
 
 
 if __name__ == '__main__':

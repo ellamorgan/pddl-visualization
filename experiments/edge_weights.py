@@ -16,7 +16,7 @@ from pddl_vis.visualizers import VISUALIZERS
 
 
 
-def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_states):
+def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_states, plan_len, num_traces):
 
     # Create graph
     graph_generator = StateEnumerator(
@@ -24,6 +24,7 @@ def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_st
         prob=problem_file
     )
     states = list(graph_generator.graph.nodes())
+    macq_states = list(map(graph_generator.tarski_state_to_macq, states))
     state_mapping = dict(zip(states, range(len(states))))
     original_state_graph = nx.relabel_nodes(graph_generator.graph, state_mapping)
     pos = nx.spring_layout(original_state_graph)
@@ -49,8 +50,8 @@ def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_st
     trace_generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=500,
-        num_traces=50
+        plan_len=plan_len,
+        num_traces=num_traces
     )
     batch_size = 100
 
@@ -137,10 +138,9 @@ def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_st
     img = Img.open(BytesIO(dot_graph.create_png()))
     img.save("results/original_graph.png")
 
-    nx.draw(original_state_graph, pos)
-    plt.show()
-    plt.savefig("orig_plt.png", format="PNG")
-    print(pos)
+    #nx.draw(original_state_graph, pos)
+    #plt.show()
+    #plt.savefig("orig_plt.png", format="PNG")
 
     # Save graph with learned edges
     nx.set_node_attributes(state_graph, pos, 'coord')
@@ -148,10 +148,12 @@ def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_st
     img = Img.open(BytesIO(dot_graph.create_png()))
     img.save("results/learned_edges.png")
 
-    nx.draw(state_graph, pos)
-    plt.show()
-    plt.savefig("learned_plt.png", format="PNG")
+    #nx.draw(state_graph, pos)
+    #plt.show()
+    #plt.savefig("learned_plt.png", format="PNG")
 
     print(f"Correct: {n_correct} Weighted: {sum_correct / max(n_correct, 1)}")
     print(f"Incorrect: {n_incorrect} Weighted: {sum_incorrect / max(n_incorrect, 1)}")
     print(f"Missing: {n_missing}")
+
+    return dataset, macq_states
