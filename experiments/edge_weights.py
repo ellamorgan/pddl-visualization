@@ -69,8 +69,8 @@ def learn_edges(model, domain_file, problem_file, name, vis_args, img_size, n_st
     state_vis = []
     for trace in trace_generator.traces:
         state_vis.append([])
-        for state in trace:
-            state_vis[-1].append(process_img(vis(state), img_size))
+        for step in trace:
+            state_vis[-1].append(process_img(vis(step), img_size))
     state_vis = np.array(state_vis)
 
     counts = np.zeros((n_states, n_states))

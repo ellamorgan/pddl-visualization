@@ -15,6 +15,7 @@ from solo.utils.checkpointer import Checkpointer
 from experiments.val_vis_test import predict_vis_trace
 from experiments.edge_weights import learn_edges
 from experiments.pred_edge_weights import train_edge_network
+from experiments.trace_pred import trace_pred_main
 
 
 
@@ -127,8 +128,11 @@ def main():
         predict_vis_trace(batch, generator, model)
     '''
     
-    edge_dataset, states = learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
-    train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
+    #edge_dataset, states = learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
+    #train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
+
+    n_data = 1000
+    trace_pred_main(model, args.domain_file, args.problem_file, n_data, args.batch_size, vis, img_size)
 
 
 if __name__ == '__main__':
