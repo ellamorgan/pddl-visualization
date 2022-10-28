@@ -2,6 +2,7 @@ import pickle
 import random
 import numpy as np
 import math
+import random
 from PIL.Image import Image
 from PIL import Image as Img
 from typing import Union, Tuple, List
@@ -17,24 +18,40 @@ class ElevatorVisualizer:
 
         person_img = Img.open("data/stick_figure.png").convert('RGB')
         w, h = person_img.size
-        print(w, h)
         scale = person_size / h
-        self.person = np.array(person_img.resize((int(w * scale), int(h * scale))))
+        self.person = (-1 * np.array(person_img.resize((int(w * scale), int(h * scale))))) + 255
         print("person is:", self.person.shape)
 
         possible_actions = generator.op_dict.keys()
         atoms = generator.problem.init.as_atoms()
 
-        print(possible_actions)
-        print(atoms)
+        people_origin = dict()
+        people_destin = dict()
+        floors = set()
+
+        for atom in atoms:
+            if atom.predicate.name == 'origin':
+                people_origin[atom.subterms[0].name] = atom.subterms[1].name
+            elif atom.predicate.name == 'destin':
+                people_destin[atom.subterms[0].name] = atom.subterms[1].name
+            elif atom.predicate.name == 'above':
+                floors.add(atom.subterms[0].name)
+                floors.add(atom.subterms[1].name)
+        
+        self.floors = list(floors)
+        self.n_floors = len(self.floors)
+        self.n_people = len(people_origin)
     
 
     def _generate_board(self, n_people, n_floors, div):
         # Dimensions are (h, w, 3)
 
+        person_h = self.person.shape[0]
+        person_w = self.person.shape[1]
+
         squares = math.ceil(math.sqrt(n_people))
-        square_h = squares * self.person.shape[0]
-        square_w = squares * self.person.shape[1]
+        square_h = squares * person_h
+        square_w = squares * person_w
 
         board = np.zeros((n_floors * square_h + (n_floors + 1) * div, 2 * square_w + 3 * div, 3))
 
@@ -43,11 +60,23 @@ class ElevatorVisualizer:
         for i in range(3):
             board[:, i * (square_w + div) : i * (square_w + div) + div, :] = 255
         
-        for i in range(n_people):
-            for j in range(n_floors):
-                # Fill elevator and floor with people
-                pass
+
+        free_spots = [(i, j) for i in range(squares) for j in range(squares)]
         
+        for i in range(n_floors):
+            free_spots = [(i, j) for i in range(squares) for j in range(squares)]
+            for _ in range(n_people):
+                # Fill elevator and floor with people
+
+                random.shuffle(free_spots)
+                pos = free_spots.pop()
+
+                h_pos = pos[0] * person_h + div
+                w_pos = pos[1] * person_w + div
+                floor_pos = i * (square_h + div)
+
+                board[h_pos + floor_pos : h_pos + floor_pos + person_h, w_pos : w_pos + person_w] = self.person
+
         img_from_array = Img.fromarray(board.astype('uint8'), 'RGB')
         img_from_array.save("results/board.jpg")
     
@@ -78,11 +107,18 @@ class ElevatorVisualizer:
 
         print("\n\n")
 
+        # A person can be on starting floor, served, or boarded
+
         for fluent, v in state.items():
-            print(v)
-            print(fluent.name)
-            print(fluent.objects)
-            print()
+            if v:
+                if fluent.name == 'lift-at':
+                    print(f"lift at {fluent.objects[0].name}")
+                elif fluent.name == 'boarded':
+                    print(f"person {fluent.objects[0].name} has boarded")
+                else:
+                    print(fluent.name)
+            else:
+                print(fluent.name)
     
 
     def visualize_trace(
