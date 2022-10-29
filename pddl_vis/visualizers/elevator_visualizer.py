@@ -12,7 +12,7 @@ from macq.generate.pddl import StateEnumerator, VanillaSampling
 
 class ElevatorVisualizer:
 
-    def __init__(self, generator, person_size):
+    def __init__(self, generator, person_size, div):
 
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
 
@@ -22,63 +22,84 @@ class ElevatorVisualizer:
         self.person = (-1 * np.array(person_img.resize((int(w * scale), int(h * scale))))) + 255
         print("person is:", self.person.shape)
 
-        possible_actions = generator.op_dict.keys()
         atoms = generator.problem.init.as_atoms()
 
         people_origin = dict()
         people_destin = dict()
-        floors = set()
+        people = set()
+
+        floor_below = []
+        floor_above = []
+        n_floors = 1
 
         for atom in atoms:
             if atom.predicate.name == 'origin':
                 people_origin[atom.subterms[0].name] = atom.subterms[1].name
+                people.add(atom.subterms[0].name)
             elif atom.predicate.name == 'destin':
                 people_destin[atom.subterms[0].name] = atom.subterms[1].name
             elif atom.predicate.name == 'above':
-                floors.add(atom.subterms[0].name)
-                floors.add(atom.subterms[1].name)
+                floor_below.append(atom.subterms[0].name)
+                floor_above.append(atom.subterms[1].name)
+                n_floors += 1
+        
+        first_floor = list(set(floor_below).difference(set(floor_above)))[0]
+        floors = [first_floor]
+        curr_floor = first_floor
+        for _ in range(n_floors):
+            curr_floor = floor_above[floor_below.index(curr_floor)]
+            floors.append(curr_floor)
         
         self.floors = list(floors)
+        self.people = list(people)
         self.n_floors = len(self.floors)
         self.n_people = len(people_origin)
+        self.people_origin = people_origin
+        self.people_destin = people_destin
+        self.div = div
+        
+        self.board, self.squares, self.square_h, self.square_w = self._generate_board()
     
 
-    def _generate_board(self, n_people, n_floors, div):
+    def _generate_board(self):
         # Dimensions are (h, w, 3)
 
         person_h = self.person.shape[0]
         person_w = self.person.shape[1]
 
-        squares = math.ceil(math.sqrt(n_people))
+        squares = math.ceil(math.sqrt(self.n_people))
         square_h = squares * person_h
         square_w = squares * person_w
 
-        board = np.zeros((n_floors * square_h + (n_floors + 1) * div, 2 * square_w + 3 * div, 3))
+        board = np.zeros((self.n_floors * square_h + (self.n_floors + 1) * self.div, 2 * square_w + 3 * self.div, 3))
 
-        for i in range(n_floors + 1):
-            board[i * (square_h + div) : i * (square_h + div) + div, :, :] = 255
+        for i in range(self.n_floors + 1):
+            board[i * (square_h + self.div) : i * (square_h + self.div) + self.div, :, :] = 255
         for i in range(3):
-            board[:, i * (square_w + div) : i * (square_w + div) + div, :] = 255
+            board[:, i * (square_w + self.div) : i * (square_w + self.div) + self.div, :] = 255
         
 
+        '''
         free_spots = [(i, j) for i in range(squares) for j in range(squares)]
-        
-        for i in range(n_floors):
+        for i in range(self.n_floors):
             free_spots = [(i, j) for i in range(squares) for j in range(squares)]
-            for _ in range(n_people):
+            for _ in range(self.n_people):
                 # Fill elevator and floor with people
 
                 random.shuffle(free_spots)
                 pos = free_spots.pop()
 
-                h_pos = pos[0] * person_h + div
-                w_pos = pos[1] * person_w + div
-                floor_pos = i * (square_h + div)
+                h_pos = pos[0] * person_h + self.div
+                w_pos = pos[1] * person_w + self.div
+                floor_pos = i * (square_h + self.div)
 
                 board[h_pos + floor_pos : h_pos + floor_pos + person_h, w_pos : w_pos + person_w] = self.person
+        '''
 
-        img_from_array = Img.fromarray(board.astype('uint8'), 'RGB')
-        img_from_array.save("results/board.jpg")
+        #img_from_array = Img.fromarray(board.astype('uint8'), 'RGB')
+        #img_from_array.save("results/board.jpg")
+
+        return board, squares, square_h, square_w
     
 
     def sample_mnist(
@@ -105,20 +126,34 @@ class ElevatorVisualizer:
         
         state = step.state
 
-        print("\n\n")
+        state_vis = np.copy(self.board)
 
-        # A person can be on starting floor, served, or boarded
+        # A person can be on starting floor (0), boarded (1), or served (2)
+        person_status = {k : 0 for k in self.people}
 
         for fluent, v in state.items():
             if v:
                 if fluent.name == 'lift-at':
-                    print(f"lift at {fluent.objects[0].name}")
+                    lift_floor = self.floors.index(fluent.objects[0].name)
+                    for i in range(self.n_floors):
+                        if i != lift_floor:
+                            h = (self.square_h + self.div) * i + self.div
+                            w = 2 * self.div + self.square_w
+                            state_vis[h : h + self.square_h, w : w + self.square_w, :] = 255
                 elif fluent.name == 'boarded':
-                    print(f"person {fluent.objects[0].name} has boarded")
-                else:
-                    print(fluent.name)
+                    person_status[fluent.objects[0].name] = 1
+                elif fluent.name == 'served':
+                    person_status[fluent.objects[0].name] = 2
+        
+        for person in self.people:
+            status = person_status[person]
+            if status == 0:
+                floor = self.people_origin[person]
+            elif status == 1:
+                floor = lift_floor
             else:
-                print(fluent.name)
+                floor = self.people_destin[person]
+
     
 
     def visualize_trace(
