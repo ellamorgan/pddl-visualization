@@ -37,15 +37,19 @@
 
 (:action board
   :parameters (?f - floor ?p - passenger)
-  :precondition (and (lift-at ?f) (origin ?p ?f))
+  :precondition (and (lift-at ?f) 
+                     (origin ?p ?f)
+                     (not (boarded ?p))              ;; I added this
+                     (not (served ?p)))              ;; I added this
   :effect (boarded ?p))
 
 (:action depart
   :parameters (?f - floor ?p - passenger)
-  :precondition (and (lift-at ?f) (destin ?p ?f)
-		     (boarded ?p))
-  :effect (and (not (boarded ?p))
-	       (served ?p)))
+  :precondition (and (lift-at ?f) 
+                     (destin ?p ?f) 
+                     (boarded ?p))
+  :effect (and (not (boarded ?p)) 
+               (served ?p)))
 ;;drive up
 
 (:action up
