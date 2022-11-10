@@ -1,0 +1,24 @@
+python3 main.py \
+    --domain_file data/pddl/grid/grid.pddl \
+    --problem_file data/pddl/grid/problems/grid2.pddl \
+    --backbone resnet18 \
+    --max_epochs 30 \
+    --devices 1 \
+    --accelerator gpu \
+    --precision 16 \
+    --num_workers 4 \
+    --optimizer lars \
+    --grad_clip_lars \
+    --eta_lars 0.02 \
+    --exclude_bias_n_norm_lars \
+    --scheduler warmup_cosine \
+    --lr 0.3 \
+    --weight_decay 1e-4 \
+    --batch_size 256 \
+    --name barlow \
+    --project solo-learn \
+    --wandb \
+    --method barlow_twins \
+    --proj_hidden_dim 2048 \
+    --proj_output_dim 2048 \
+    --scale_loss 0.1

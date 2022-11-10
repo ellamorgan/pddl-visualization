@@ -11,6 +11,7 @@ from macq.generate.pddl import VanillaSampling, Generator
 '''
 
 Blocks are disappearing and I'm not sure why
+(I found out why - blocks can be placed on top of themselves)
 
 '''
 
