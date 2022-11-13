@@ -38,16 +38,19 @@ class PDDLDataset(Dataset):
     def __getitem__(self, index):
         if self.train:
             if index >= self.n_states * self.n_pairs:
-                raise IndexError("Dataset index out of range")
+                raise IndexError(f"Dataset index {index} out of range for size {self.n_states * self.n_pairs}")
             state_ind = index // self.n_pairs
             p1, p2 = get_combination(index % self.n_pairs, self.n_samples, self.n_pairs)
             return index, self.data[state_ind][p1], self.data[state_ind][p2], state_ind
         else:
             if index >= self.n_states * self.n_samples:
-                raise IndexError("Dataset index out of range")
+                raise IndexError(f"Dataset index {index} out of range for size {self.n_states * self.n_samples}")
             state_ind = index // self.n_samples
             sample_ind = index % self.n_samples
             return self.data[state_ind][sample_ind], state_ind
     
     def __len__(self):
-        return self.n_states * self.n_pairs
+        if self.train:
+            return self.n_states * self.n_pairs
+        else:
+            return self.n_states * self.n_samples

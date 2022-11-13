@@ -7,15 +7,15 @@ from pddl_vis.visualizers import VISUALIZERS
 import numpy as np
 
 
-def get_domain(domain_file, problem_file, vis_args):
+def get_domain(domain, domain_file, problem_file, vis_args = {}):
 
-    name = domain_file.split('/')[-1].split('.')[0]
-    assert name in VISUALIZERS.keys()
+    assert domain in VISUALIZERS.keys()
 
     generator = StateEnumerator(dom=domain_file, prob=problem_file)
-    vis = VISUALIZERS[name](generator, **vis_args).visualize_state
+    n_states = generator.graph.number_of_nodes()
+    vis = VISUALIZERS[domain](generator, **vis_args).visualize_state
 
-    return generator, vis
+    return generator, vis, n_states
 
 
 

@@ -17,19 +17,18 @@ python3 main.py \
     --scheduler warmup_cosine \
     --lr 0.6 \
     --min_lr 0.0006 \
+    --warmup_start_lr 0.0 \
+    --warmup_epochs 11 \
     --classifier_lr 0.1 \
     --weight_decay 1e-6 \
     --batch_size 256 \
     --num_workers 4 \
-    --name swav-$1-$2 \
+    --name deepclusterv2-$1-$2 \
+    --project solo-learn \
     --wandb \
     --save_checkpoint \
     --auto_resume \
-    --project solo-learn \
-    --method swav \
+    --method deepclusterv2 \
     --proj_hidden_dim 2048 \
-    --queue_size 3840 \
     --proj_output_dim 128 \
-    --num_prototypes 3000 \
-    --epoch_queue_starts 50 \
-    --freeze_prototypes_epochs 2
+    --num_prototypes 3000 3000 3000

@@ -45,6 +45,7 @@ class BlocksVisualizer:
         self.block_w = block_w + 2 * outline_width
         self.outline_width = outline_width
         self.imgs = [self._make_block(self._sample_mnist(i)) for i in range(len(blocks))]
+        self.img_size = img_size
 
     
     def _make_block(self, img):
@@ -77,7 +78,6 @@ class BlocksVisualizer:
     ) -> Union[np.ndarray, Image]:
 
         if isinstance(state, Step):
-            print(state.action)
             state = state.state
 
         sep_width = int(0.5 * self.block_w)

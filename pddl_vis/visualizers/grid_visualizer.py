@@ -1,16 +1,27 @@
 import pickle
 import random
 import numpy as np
-from PIL import Image
+from PIL.Image import Image
+from PIL import Image as Img
 import math
+from typing import Union, Tuple, List
+from macq.trace import State, Step, Trace
+from macq.generate.pddl import Generator
 
 
 class GridVisualizer:
 
-    def __init__(self, generator, square_width, div_width, door_width, key_size, robot_size):
+    def __init__(self, 
+        generator : Generator, 
+        square_width : int = 50, 
+        div_width : int = 1, 
+        door_width : int = 6, 
+        key_size : int = 15, 
+        robot_size : int = 17
+    ) -> None:
 
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
-        robot_img = Image.open("data/robot.jpg").convert('RGB')
+        robot_img = Img.open("data/robot.jpg").convert('RGB')
         self.robot_img = np.array(robot_img.resize((robot_size, robot_size)))
 
         # Assumes
@@ -79,7 +90,7 @@ class GridVisualizer:
 
     def _sample_mnist(self, num, key_size):
         sample = random.choice(self.mnist_data[str(num)])
-        sample = Image.fromarray(sample)
+        sample = Img.fromarray(sample)
         sample = np.array(sample.resize((key_size, key_size)))[:, :, np.newaxis]
         sample = np.tile(sample, 3)
         return sample
@@ -150,10 +161,18 @@ class GridVisualizer:
         return state_vis
 
 
-    def visualize_state(self, step, out_name=None, memory=False, size=None, lightscale=False):
+    def visualize_state(
+        self, 
+        state: Union[Step, State], 
+        out_path: Union[str, None] = None, 
+        memory: bool = False, 
+        size: Union[Tuple[int, int], None] = None, 
+        lightscale: bool = False,
+    ) -> Union[np.ndarray, Image]:
 
-        state = step.state
-        action = step.action
+        if isinstance(state, Step):
+            action = state.action
+            state = state.state
 
         state_vis = np.copy(self.board)
         robot_pos = ()
@@ -195,11 +214,11 @@ class GridVisualizer:
         
         if action is not None and memory:
             if action.name == 'pickup':
-                del self.obj_pos[step.action.obj_params[1].name]
+                del self.obj_pos[action.obj_params[1].name]
         
         state_vis[state_vis > 255] = 255
 
-        img_from_array = Image.fromarray(state_vis.astype('uint8'), 'RGB')
+        img_from_array = Img.fromarray(state_vis.astype('uint8'), 'RGB')
 
         if lightscale:
             img_from_array = img_from_array.convert('L')
@@ -207,16 +226,23 @@ class GridVisualizer:
         if size is not None:
             img_from_array = img_from_array.resize(size)
 
-        if out_name is not None:
-            img_from_array.save(out_name)
+        if out_path is not None:
+            img_from_array.save(out_path)
 
         return img_from_array
 
 
-    def visualize_trace(self, trace, out_path=None, duration=1000, size=None):
+    def visualize_trace(
+        self,
+        trace: Trace,
+        out_path: Union[str, None] = None,
+        duration: int = 1000,
+        size: Union[Tuple[int, int], None] = None,
+        memory: bool = True,
+    ) -> List[Image]:
         imgs = []
         for step in trace:
-            imgs.append(self.visualize_state(step, memory=True, size=size))
+            imgs.append(self.visualize_state(step, memory=memory, size=size))
             
         if out_path is not None:
             imgs[0].save(out_path, save_all=True, append_images=imgs[1:], duration=duration, loop=0)

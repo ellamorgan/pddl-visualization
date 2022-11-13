@@ -11,25 +11,22 @@ python3 main.py \
     --devices 1 \
     --accelerator gpu \
     --precision 16 \
-    --optimizer lars \
-    --grad_clip_lars \
-    --eta_lars 0.02 \
+    --optimizer sgd \
     --scheduler warmup_cosine \
-    --lr 0.6 \
-    --min_lr 0.0006 \
-    --classifier_lr 0.1 \
-    --weight_decay 1e-6 \
+    --lr 0.3 \
+    --classifier_lr 0.3 \
+    --weight_decay 1e-4 \
     --batch_size 256 \
     --num_workers 4 \
-    --name swav-$1-$2 \
+    --name mocov2plus-$1-$2 \
+    --project solo-learn \
     --wandb \
     --save_checkpoint \
     --auto_resume \
-    --project solo-learn \
-    --method swav \
+    --method mocov2plus \
     --proj_hidden_dim 2048 \
-    --queue_size 3840 \
-    --proj_output_dim 128 \
-    --num_prototypes 3000 \
-    --epoch_queue_starts 50 \
-    --freeze_prototypes_epochs 2
+    --queue_size 32768 \
+    --temperature 0.2 \
+    --base_tau_momentum 0.99 \
+    --final_tau_momentum 0.999 \
+    --momentum_classifier

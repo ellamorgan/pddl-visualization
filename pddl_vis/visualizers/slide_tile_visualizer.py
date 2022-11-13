@@ -108,11 +108,12 @@ class SlideTileVisualizer:
         out_path: Union[str, None] = None,
         duration: int = 1000,
         size: Union[Tuple[int, int], None] = None,
+        memory: bool = True,
     ) -> List[Image]:
 
         imgs = []
         for step in trace:
-            imgs.append(self.visualize_state(step, memory=True, size=size))
+            imgs.append(self.visualize_state(step, memory=memory, size=size))
             
         if out_path is not None:
             imgs[0].save(out_path, save_all=True, append_images=imgs[1:], duration=duration, loop=0)

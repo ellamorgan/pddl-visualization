@@ -1,8 +1,13 @@
 python3 main.py \
-    --domain_file data/pddl/grid/grid.pddl \
-    --problem_file data/pddl/grid/problems/grid1.pddl \
+    --domain $1 \
+    --problem $2 \
+    --train_samples 20 \
+    --val_samples 5 \
+    --test_samples 5 \
+    --img_h 48 \
+    --img_w 48 \
     --backbone resnet18 \
-    --max_epochs 30 \
+    --max_epochs 5 \
     --devices 1 \
     --accelerator gpu \
     --precision 16 \
@@ -16,9 +21,11 @@ python3 main.py \
     --weight_decay 1e-5 \
     --batch_size 256 \
     --num_workers 4 \
-    --name nnbyol-$1 \
+    --name nnbyol-$1-$2 \
     --project solo-learn \
     --wandb \
+    --save_checkpoint \
+    --auto_resume \
     --method nnbyol \
     --proj_output_dim 256 \
     --proj_hidden_dim 4096 \

@@ -11,25 +11,21 @@ python3 main.py \
     --devices 1 \
     --accelerator gpu \
     --precision 16 \
-    --optimizer lars \
-    --grad_clip_lars \
-    --eta_lars 0.02 \
+    --optimizer sgd \
     --scheduler warmup_cosine \
-    --lr 0.6 \
-    --min_lr 0.0006 \
+    --lr 0.05 \
     --classifier_lr 0.1 \
-    --weight_decay 1e-6 \
+    --weight_decay 1e-4 \
     --batch_size 256 \
     --num_workers 4 \
-    --name swav-$1-$2 \
+    --name ressl-$1-$2 \
+    --project solo-learn \
     --wandb \
     --save_checkpoint \
     --auto_resume \
-    --project solo-learn \
-    --method swav \
-    --proj_hidden_dim 2048 \
-    --queue_size 3840 \
-    --proj_output_dim 128 \
-    --num_prototypes 3000 \
-    --epoch_queue_starts 50 \
-    --freeze_prototypes_epochs 2
+    --method ressl \
+    --proj_output_dim 256 \
+    --proj_hidden_dim 4096 \
+    --base_tau_momentum 0.99 \
+    --final_tau_momentum 1.0 \
+    --momentum_classifier

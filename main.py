@@ -23,37 +23,25 @@ def main():
 
     # Closely resembles main_pretrain.py from solo-learn
 
-    #n_states=20
-    n_states = 90
-    args = load_args(n_states=n_states)
+    args = load_args()
+
+    domain_file = 'data/pddl/' + args.domain + '/' + args.domain + '.pddl'
+    problem_file = 'data/pddl/' + args.domain + '/problems/' + args.problem + '.pddl'
+
+    generator, vis, n_states = get_domain(
+        domain = args.domain,
+        domain_file=domain_file, 
+        problem_file=problem_file
+    )
+    args.num_classes = n_states
 
     #model = METHODS[args.method].load_from_checkpoint("trained_models/swav/solo-learn/2ev6njzg/checkpoints/epoch=1-step=1566.ckpt", **args.__dict__)
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
 
-    # Add these to args
-    vis_args = {
-        'square_width': 50,
-        'div_width': 1,
-        'door_width': 6,
-        'key_size': 15,
-        'robot_size': 17,
-    }
-
-    train_samples=30
-    val_samples=3
-    test_samples=3
-    img_size=(48, 48)
-
-    generator, vis = get_domain(
-        domain_file=args.domain_file, 
-        problem_file=args.problem_file, 
-        vis_args=vis_args
-    )
-
-    train_data = PDDLDataset(generator, vis, n_samples=train_samples, img_size=img_size)
-    val_data = PDDLDataset(generator, vis, n_samples=val_samples, img_size=img_size, train=False)
-    test_data = PDDLDataset(generator, vis, n_samples=test_samples, img_size=img_size, train=False)
+    train_data = PDDLDataset(generator, vis, n_samples=args.train_samples, img_size=(args.img_h, args.img_w))
+    val_data = PDDLDataset(generator, vis, n_samples=args.val_samples, img_size=(args.img_h, args.img_w), train=False)
+    test_data = PDDLDataset(generator, vis, n_samples=args.test_samples, img_size=(args.img_h, args.img_w), train=False)
 
     train_loader, val_loader, test_loader = prepare_dataloader(
         train_dataset=train_data, 
@@ -63,8 +51,7 @@ def main():
         num_workers=args.num_workers
     )
 
-    wandb_run_id = None
-    '''
+    ckpt_path, wandb_run_id = None, None
     if args.auto_resume and args.resume_from_checkpoint is None:
         auto_resumer = AutoResumer(
             checkpoint_dir=os.path.join(args.checkpoint_dir, args.method),
@@ -80,11 +67,9 @@ def main():
     elif args.resume_from_checkpoint is not None:
         ckpt_path = args.resume_from_checkpoint
         del args.resume_from_checkpoint
-    '''
 
     callbacks = []
 
-    '''
     if args.save_checkpoint:
         # save checkpoint on last epoch only
         ckpt = Checkpointer(
@@ -93,7 +78,6 @@ def main():
             frequency=args.checkpoint_frequency,
         )
         callbacks.append(ckpt)
-    '''
     
     # wandb logging
     if args.wandb:
@@ -121,18 +105,18 @@ def main():
         else args.strategy,
     )
 
-    trainer.fit(model, train_loader, val_loader)
+    trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
     '''
     for batch in test_loader:
         predict_vis_trace(batch, generator, model)
     '''
     
-    #edge_dataset, states = learn_edges(model, args.domain_file, args.problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
+    #edge_dataset, states = learn_edges(model, domain_file, problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
     #train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
 
     n_data = 1000
-    trace_pred_main(model, args.domain_file, args.problem_file, n_data, args.batch_size, vis, img_size)
+    trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, vis, (args.img_h, args.img_w))
 
 
 if __name__ == '__main__':
