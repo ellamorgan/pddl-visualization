@@ -1,33 +1,28 @@
-from typing import Callable, List
+from typing import List, Tuple, Union
 from torch.utils.data.dataset import Dataset
 from macq.generate.pddl import StateEnumerator
-from macq.trace import Step
 import math
 import numpy as np
 from pddl_vis.utils import get_combination
+from pddl_vis.visualizers import Visualizer
 
 
 class PDDLDataset(Dataset):
 
     def __init__(
         self,
-        generator: StateEnumerator,
-        vis: Callable,
+        visualizer: Visualizer,
         n_samples: int,
-        img_size: tuple,
+        img_size: Union[Tuple[int, int], None] = None,
         train: bool = True,
         inds: List[int] = [],
+        seed : Union[int, None] = None,
     ) -> None:
-
-        if len(inds) == 0:
-            self.states = [generator.tarski_state_to_macq(state) for state in generator.graph.nodes()]
-        else:
-            self.states = [generator.tarski_state_to_macq(generator.graph.nodes[i]) for i in inds]
 
         def preprocess(img):
             return (np.array(img).transpose((2, 0, 1)) / 127.5) - 1
             
-        self.data = [[preprocess(vis(Step(state, None, 0), size=img_size)) for _ in range(n_samples)] for state in self.states]
+        self.data = visualizer.create_dataset(n_samples=n_samples, preprocess=preprocess, img_size=img_size, seed=seed)
         self.targets = list(range(len(self.data)))
         self.n_states = len(self.data)
         self.n_samples = n_samples

@@ -1,12 +1,12 @@
 import pickle
 import random
 import numpy as np
-import copy
 from PIL.Image import Image
 from PIL import Image as Img
 from typing import Union, Tuple, List
 from macq.trace import State, Step, Trace
 from macq.generate.pddl import VanillaSampling, Generator
+from .base_visualizer import Visualizer
 
 '''
 
@@ -15,14 +15,17 @@ Blocks are disappearing and I'm not sure why
 
 '''
 
+'''
+Randomness: sampling from MNIST, no other source presently
+'''
 
 
-class BlocksVisualizer:
+
+class BlocksVisualizer(Visualizer):
 
     def __init__(
         self, 
         generator: Generator,
-        img_size: Union[Tuple[int, int], None] = None,
         outline_width : int = 1,
     ) -> None:
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
@@ -45,7 +48,6 @@ class BlocksVisualizer:
         self.block_w = block_w + 2 * outline_width
         self.outline_width = outline_width
         self.imgs = [self._make_block(self._sample_mnist(i)) for i in range(len(blocks))]
-        self.img_size = img_size
 
     
     def _make_block(self, img):

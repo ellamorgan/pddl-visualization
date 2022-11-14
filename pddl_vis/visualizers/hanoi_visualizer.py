@@ -7,15 +7,18 @@ from PIL import Image as Img
 from typing import Union, Tuple, List
 from macq.trace import State, Step, Trace
 from macq.generate.pddl import VanillaSampling, Generator
+from .base_visualizer import Visualizer
 
 
-class HanoiVisualizer:
+class HanoiVisualizer(Visualizer):
 
     def __init__(
         self, 
         generator: Generator,
-        img_size: Union[Tuple[int, int], None] = None,
     ) -> None:
+
+        super().__init__(generator)
+
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
         tile_h, tile_w, _ = self._sample_mnist(0).shape
 
@@ -47,7 +50,6 @@ class HanoiVisualizer:
         self.pegs = pegs
         self.n_disks = len(disks)
         self.n_pegs = len(pegs)
-        self.img_size = img_size
         self.tile_w = tile_w
         self.tile_h = tile_h
         self.imgs = [self._sample_mnist(i) for i in range(len(disks))]
@@ -119,24 +121,6 @@ class HanoiVisualizer:
         return img
     
 
-
-    def visualize_trace(
-        self,
-        trace: Trace,
-        out_path: Union[str, None] = None,
-        duration: int = 1000,
-        size: Union[Tuple[int, int], None] = None,
-        memory: bool = True,
-    ) -> List[Image]:
-
-        imgs = []
-        for step in trace:
-            imgs.append(self.visualize_state(step, memory=memory, size=size))
-            
-        if out_path is not None:
-            imgs[0].save(out_path, save_all=True, append_images=imgs[1:], duration=duration, loop=0)
-        
-        return imgs
 
 
 if __name__ == '__main__':

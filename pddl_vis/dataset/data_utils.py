@@ -13,9 +13,9 @@ def get_domain(domain, domain_file, problem_file, vis_args = {}):
 
     generator = StateEnumerator(dom=domain_file, prob=problem_file)
     n_states = generator.graph.number_of_nodes()
-    vis = VISUALIZERS[domain](generator, **vis_args).visualize_state
+    visualizer = VISUALIZERS[domain](generator, **vis_args)
 
-    return generator, vis, n_states
+    return visualizer, n_states
 
 
 

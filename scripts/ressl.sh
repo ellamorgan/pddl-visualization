@@ -7,7 +7,7 @@ python3 main.py \
     --img_h 48 \
     --img_w 48 \
     --backbone resnet18 \
-    --max_epochs 5 \
+    --max_epochs $3 \
     --devices 1 \
     --accelerator gpu \
     --precision 16 \
@@ -18,11 +18,9 @@ python3 main.py \
     --weight_decay 1e-4 \
     --batch_size 256 \
     --num_workers 4 \
-    --name ressl-$1-$2 \
+    --name ressl-$1-$2-$3 \
     --project solo-learn \
     --wandb \
-    --save_checkpoint \
-    --auto_resume \
     --method ressl \
     --proj_output_dim 256 \
     --proj_hidden_dim 4096 \

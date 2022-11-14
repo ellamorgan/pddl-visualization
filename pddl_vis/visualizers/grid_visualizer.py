@@ -6,10 +6,11 @@ from PIL import Image as Img
 import math
 from typing import Union, Tuple, List
 from macq.trace import State, Step, Trace
-from macq.generate.pddl import Generator
+from macq.generate.pddl import Generator, StateEnumerator
+from .base_visualizer import Visualizer
 
 
-class GridVisualizer:
+class GridVisualizer(Visualizer):
 
     def __init__(self, 
         generator : Generator, 
@@ -19,6 +20,8 @@ class GridVisualizer:
         key_size : int = 15, 
         robot_size : int = 17
     ) -> None:
+
+        super().__init__(generator)
 
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
         robot_img = Img.open("data/robot.jpg").convert('RGB')
@@ -137,7 +140,7 @@ class GridVisualizer:
         counter = 0
 
         def rand_pos(img_len):
-            return np.random.randint(0, self.square_w - img_len)
+            return random.randint(0, self.square_w - img_len)
 
         if name in self.obj_pos and memory:
             x1, y1 = self.obj_pos[name]
@@ -173,6 +176,8 @@ class GridVisualizer:
         if isinstance(state, Step):
             action = state.action
             state = state.state
+        else:
+            action = None
 
         state_vis = np.copy(self.board)
         robot_pos = ()
@@ -248,3 +253,25 @@ class GridVisualizer:
             imgs[0].save(out_path, save_all=True, append_images=imgs[1:], duration=duration, loop=0)
         
         return imgs
+
+
+
+if __name__ == '__main__':
+
+    domain_file = "data/pddl/grid/grid.pddl"
+    problem_file = "data/pddl/grid/problems/grid1.pddl"
+
+    generator = StateEnumerator(
+        dom=domain_file, 
+        prob=problem_file
+    )
+
+    vis = GridVisualizer(generator)
+
+    img1, img2 = vis.create_dataset(n_samples=2, inds=[0], seed=1)[0]
+    img3, img4 = vis.create_dataset(n_samples=2, inds=[0], seed=1)[0]
+
+    img1.save("results/seed_test_1_1.jpg")
+    img2.save("results/seed_test_2_1.jpg")
+    img3.save("results/seed_test_1_2.jpg")
+    img4.save("results/seed_test_2_2.jpg")

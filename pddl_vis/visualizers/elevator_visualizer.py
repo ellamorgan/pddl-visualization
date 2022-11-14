@@ -2,15 +2,15 @@ import pickle
 import random
 import numpy as np
 import math
-import random
 from PIL.Image import Image
 from PIL import Image as Img
 from typing import Union, Tuple, List
 from macq.trace import Step, Trace
 from macq.generate.pddl import StateEnumerator, VanillaSampling
+from .base_visualizer import Visualizer
 
 
-class ElevatorVisualizer:
+class ElevatorVisualizer(Visualizer):
 
     def __init__(self, 
         generator : StateEnumerator, 
@@ -143,8 +143,9 @@ class ElevatorVisualizer:
         lightscale: bool = False,
     ) -> Union[np.ndarray, Image]:
 
-        state = step.state
-        action = step.action
+        if isinstance(state, Step):
+            action = state.action
+            state = state.state
 
         # A person can be on starting floor (0), boarded (1), or served (2)
         person_status = {k : 0 for k in self.people}
@@ -220,23 +221,24 @@ class ElevatorVisualizer:
         return imgs
 
 
-
 if __name__ == '__main__':
 
-    domain_file = "data/pddl/elevator.pddl"
-    problem_file = "data/pddl/elevator-2.pddl"
+    domain_file = "data/pddl/elevator/elevator.pddl"
+    problem_file = "data/pddl/elevator/problems/elevator-2.pddl"
 
-    generator = StateEnumerator(dom=domain_file, prob=problem_file)
-    states = list(generator.graph.nodes())
-    print(f"There are {len(states)} states")
-
-    trace_generator = VanillaSampling(
+    generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=50,
+        plan_len=3,
         num_traces=1
     )
 
-    vis = ElevatorVisualizer(generator, person_size=20, div=1)
+    vis = ElevatorVisualizer(generator)
 
-    vis.visualize_trace(trace_generator.traces[0], out_path="results/gifs/elevator_trace.gif", duration=500)
+    random.seed(0)
+
+    vis.visualize_trace(generator.traces[0], out_path="results/gifs/elevator_seed_test1.gif", memory=False)
+
+    random.seed(0)
+
+    vis.visualize_trace(generator.traces[0], out_path="results/gifs/elevator_seed_test2.gif", memory=False)

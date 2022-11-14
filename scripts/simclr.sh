@@ -7,7 +7,7 @@ python3 main.py \
     --test_samples 5 \
     --img_h 48 \
     --img_w 48 \
-    --max_epochs 5 \
+    --max_epochs $3 \
     --devices 1 \
     --accelerator gpu \
     --precision 16 \
@@ -21,11 +21,9 @@ python3 main.py \
     --weight_decay 1e-5 \
     --batch_size 256 \
     --num_workers 4 \
-    --name simclr-$1-$2 \
+    --name simclr-$1-$2-$3 \
     --project solo-learn \
     --wandb \
-    --save_checkpoint \
-    --auto_resume \
     --method simclr \
     --temperature 0.2 \
     --proj_hidden_dim 2048 \

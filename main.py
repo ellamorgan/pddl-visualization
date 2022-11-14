@@ -23,12 +23,14 @@ def main():
 
     # Closely resembles main_pretrain.py from solo-learn
 
+    seed = 0
+
     args = load_args()
 
     domain_file = 'data/pddl/' + args.domain + '/' + args.domain + '.pddl'
     problem_file = 'data/pddl/' + args.domain + '/problems/' + args.problem + '.pddl'
 
-    generator, vis, n_states = get_domain(
+    visualizer, n_states = get_domain(
         domain = args.domain,
         domain_file=domain_file, 
         problem_file=problem_file
@@ -39,9 +41,9 @@ def main():
     model = METHODS[args.method](**args.__dict__)
     make_contiguous(model)
 
-    train_data = PDDLDataset(generator, vis, n_samples=args.train_samples, img_size=(args.img_h, args.img_w))
-    val_data = PDDLDataset(generator, vis, n_samples=args.val_samples, img_size=(args.img_h, args.img_w), train=False)
-    test_data = PDDLDataset(generator, vis, n_samples=args.test_samples, img_size=(args.img_h, args.img_w), train=False)
+    train_data = PDDLDataset(visualizer, n_samples=args.train_samples, img_size=(args.img_h, args.img_w), seed=seed)
+    val_data = PDDLDataset(visualizer, n_samples=args.val_samples, img_size=(args.img_h, args.img_w), train=False, seed=seed)
+    test_data = PDDLDataset(visualizer, n_samples=args.test_samples, img_size=(args.img_h, args.img_w), train=False, seed=seed)
 
     train_loader, val_loader, test_loader = prepare_dataloader(
         train_dataset=train_data, 
@@ -116,7 +118,7 @@ def main():
     #train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
 
     n_data = 1000
-    trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, vis, (args.img_h, args.img_w))
+    trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
 
 
 if __name__ == '__main__':
