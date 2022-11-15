@@ -5,6 +5,24 @@ from sklearn.decomposition import PCA
 from sklearn import metrics
 import matplotlib.pyplot as plt
 
+'''
+def get_embeddings(model, device, data, batch):
+
+    embeddings = []
+    labels = []
+
+    for batch, labels_ in data_iterator(data['data'], data['labels'], batch, contrastive=False):
+        batch = batch.to(device, dtype=torch.float)
+        embedding = model.encoder(batch)
+        embeddings.append(embedding.detach().to('cpu').numpy())
+        if len(labels_.shape) == 1:
+            labels_ = torch.unsqueeze(labels_, 1)
+        labels.append(labels_[:, np.newaxis])
+    
+    embeddings = np.vstack(embeddings)
+    labels = np.squeeze(np.vstack(labels))
+    return embeddings, labels
+'''
 
 
 

@@ -1,5 +1,5 @@
 import os
-from pddl_vis.utils import load_args
+from pddl_vis.utils import load_args, clustering_test
 from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain
 
 from pytorch_lightning import Trainer
@@ -17,6 +17,7 @@ from experiments.edge_weights import learn_edges
 from experiments.pred_edge_weights import train_edge_network
 from experiments.trace_pred import trace_pred_main
 
+import numpy as np
 
 
 def main():
@@ -109,16 +110,32 @@ def main():
 
     trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
-    '''
+    embeddings = []
+    labels = []
+
     for batch in test_loader:
-        predict_vis_trace(batch, generator, model)
-    '''
+        x, l = batch
+        out = model(x)
+        embeddings.append(out['feats'].detach().numpy())
+        labels.append(l.detach().numpy())
     
-    #edge_dataset, states = learn_edges(model, domain_file, problem_file, "grid", vis_args, img_size, n_states, plan_len=50, num_traces=10)
-    #train_edge_network(edge_dataset, model, vis, n_samples=3, states=states, img_size=img_size, batch_size=args.batch_size, epochs=200)
+    embeddings = np.array(embeddings)[0]    # (1, 256, 512)  
+    labels = np.array(labels)[0]            # (1, 256)
+
+    homogeneity, completeness, v_measure = clustering_test(embeddings, labels, n_states)
 
     n_data = 1000
-    trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
+    before_accuracy, after_accuracy, before_in_graph, after_in_graph = trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
+
+    if args.wandb:
+        wandb_logger.run.summary['homogeneity'] = 100 * homogeneity
+        wandb_logger.run.summary['completeness'] = 100 * completeness
+        wandb_logger.run.summary['v_measure'] = 100 * v_measure
+
+        wandb_logger.run.summary['before_accuracy'] = before_accuracy
+        wandb_logger.run.summary['after_accuracy'] = after_accuracy
+        wandb_logger.run.summary['before_in_graph'] = 100 * before_in_graph
+        wandb_logger.run.summary['after_in_graph'] = 100 * after_in_graph
 
 
 if __name__ == '__main__':

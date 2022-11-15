@@ -124,8 +124,16 @@ def trace_pred_main(model, domain_file, problem_file, n_data, batch_size, vis, i
             found += 1
             state_pred.append(preds[i+1, pred_selected[i+1]])
     
-    print(f"Before: {100 * sum(preds[:, 0] == np.array(trace_states)) / len(trace_states):.2f}% correct")
-    print(f"After:  {100 * sum(np.array(state_pred) == np.array(trace_states)) / len(trace_states):.2f}% correct")
+    before_accuracy = 100 * sum(preds[:, 0] == np.array(trace_states)) / len(trace_states)
+    after_accuracy = 100 * sum(np.array(state_pred) == np.array(trace_states)) / len(trace_states)
+
+    before_in_graph = 100 * yes / (len(preds) - 1)
+    after_in_graph = 100 * found / (len(preds) - 1)
     
-    print(f"Before: {100 * yes / (len(preds) - 1):.2f}% in the graph, {100 * no / (len(preds) - 1):.2f}% not in the graph")
-    print(f"After:  {100 * found / (len(preds) - 1):.2f}% in the graph, {100 * never_found / (len(preds) - 1):.2f}% not in the graph")
+    print(f"Before: {before_accuracy:.2f}% correct")
+    print(f"After:  {after_accuracy:.2f}% correct")
+    
+    print(f"Before: {before_in_graph:.2f}% in the graph")
+    print(f"After:  {after_in_graph:.2f}% in the graph")
+
+    return before_accuracy, after_accuracy, before_in_graph, after_in_graph
