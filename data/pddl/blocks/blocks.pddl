@@ -1,20 +1,49 @@
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+;;; 4 Op-blocks world
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (domain blocks_world)
-  (:requirements :strips)
-  (:predicates (on-table ?x) (on ?x ?y) (clear ?x))
+(define (domain BLOCKS)
+  (:requirements :strips :typing)
+  (:types block)
+  (:predicates (on ?x - block ?y - block)
+	       (ontable ?x - block)
+	       (clear ?x - block)
+	       (handempty)
+	       (holding ?x - block)
+	       )
 
-  (:action MoveToTable
-    :parameters (?omf ?lower)
-    :precondition (and (clear ?omf) (on ?omf ?lower))
-    :effect (and (clear ?lower) (on-table ?omf) (not (on ?omf ?lower))))
+  (:action pick-up
+	     :parameters (?x - block)
+	     :precondition (and (clear ?x) (ontable ?x) (handempty))
+	     :effect
+	     (and (not (ontable ?x))
+		   (not (clear ?x))
+		   (not (handempty))
+		   (holding ?x)))
 
-  (:action MoveToBlock1
-    :parameters (?omf ?lower ?dest)
-    :precondition (and (clear ?omf) (clear ?dest) (on ?omf ?lower))
-    :effect (and (clear ?lower) (on ?omf ?dest) (not (clear ?dest)) (not (on ?omf ?lower))))
-
-  (:action MoveToBlock2
-    :parameters (?omf ?dest)
-    :precondition (and (clear ?omf) (clear ?dest) (on-table ?omf))
-    :effect (and (on ?omf ?dest) (not (clear ?dest)) (not (on-table ?omf))))
-  )
+  (:action put-down
+	     :parameters (?x - block)
+	     :precondition (holding ?x)
+	     :effect
+	     (and (not (holding ?x))
+		   (clear ?x)
+		   (handempty)
+		   (ontable ?x)))
+  (:action stack
+	     :parameters (?x - block ?y - block)
+	     :precondition (and (holding ?x) (clear ?y))
+	     :effect
+	     (and (not (holding ?x))
+		   (not (clear ?y))
+		   (clear ?x)
+		   (handempty)
+		   (on ?x ?y)))
+  (:action unstack
+	     :parameters (?x - block ?y - block)
+	     :precondition (and (on ?x ?y) (clear ?x) (handempty))
+	     :effect
+	     (and (holding ?x)
+		   (clear ?y)
+		   (not (clear ?x))
+		   (not (handempty))
+		   (not (on ?x ?y)))))

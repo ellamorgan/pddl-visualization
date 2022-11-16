@@ -1,7 +1,7 @@
 python3 main.py \
     --domain $1 \
     --problem $2 \
-    --train_samples 30 \
+    --train_samples 20 \
     --val_samples 5 \
     --test_samples 5 \
     --img_h 48 \

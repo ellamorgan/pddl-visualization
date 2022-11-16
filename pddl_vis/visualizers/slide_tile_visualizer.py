@@ -6,7 +6,7 @@ from PIL.Image import Image
 from PIL import Image as Img
 from typing import Union, Tuple, List
 from macq.trace import State, Step, Trace
-from macq.generate.pddl import Generator
+from macq.generate.pddl import Generator, VanillaSampling
 from .base_visualizer import Visualizer
 
 
@@ -100,4 +100,23 @@ class SlideTileVisualizer(Visualizer):
             img.save(out_path)
 
         return img
-    
+
+
+if __name__ == '__main__':
+
+    domain_file = "data/pddl/slide_tile/slide_tile.pddl"
+    problem_file = "data/pddl/slide_tile/problems/slide_tile1.pddl"
+
+    generator = VanillaSampling(
+        dom=domain_file, 
+        prob=problem_file,
+        plan_len=50,
+        num_traces=1
+    )
+
+    vis = SlideTileVisualizer(generator)
+
+    step = generator.traces[0][30]
+    vis.visualize_state(step, "results/slide_tile_before.jpg")
+    step = generator.traces[0][31]
+    vis.visualize_state(step, "results/slide_tile_after.jpg")

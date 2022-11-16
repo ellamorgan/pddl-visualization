@@ -131,10 +131,13 @@ if __name__ == '__main__':
     generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=30,
+        plan_len=50,
         num_traces=1
     )
 
     vis = HanoiVisualizer(generator)
 
-    vis.visualize_trace(generator.traces[0], out_path="results/gifs/hanoi_test.gif", memory=False)
+    step = generator.traces[0][30]
+    vis.visualize_state(step, "results/hanoi_before.jpg")
+    step = generator.traces[0][31]
+    vis.visualize_state(step, "results/hanoi_after.jpg")

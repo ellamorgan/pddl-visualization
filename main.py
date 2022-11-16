@@ -127,6 +127,7 @@ def main():
     n_data = 1000
     before_accuracy, after_accuracy, before_in_graph, after_in_graph = trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
 
+    '''
     if args.wandb:
         wandb_logger.run.summary['homogeneity'] = 100 * homogeneity
         wandb_logger.run.summary['completeness'] = 100 * completeness
@@ -134,8 +135,9 @@ def main():
 
         wandb_logger.run.summary['before_accuracy'] = before_accuracy
         wandb_logger.run.summary['after_accuracy'] = after_accuracy
-        wandb_logger.run.summary['before_in_graph'] = 100 * before_in_graph
-        wandb_logger.run.summary['after_in_graph'] = 100 * after_in_graph
+        wandb_logger.run.summary['before_in_graph'] = before_in_graph
+        wandb_logger.run.summary['after_in_graph'] = after_in_graph
+    '''
 
 
 if __name__ == '__main__':

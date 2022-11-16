@@ -36,9 +36,9 @@ class BlocksVisualizer(Visualizer):
         blocks = []
 
         for atom in atoms:
-            if atom.predicate.name == 'on' or atom.predicate.name == 'on-table':
+            if atom.predicate.name == 'on' or atom.predicate.name == 'ontable':
                 blocks.append(atom.subterms[0].name)
-        
+
         blocks.sort()
         assert len(blocks) <= 10, "Sorry we only have 10 numbers (0-9), so you can only have 10 blocks (for now)"
 
@@ -84,7 +84,7 @@ class BlocksVisualizer(Visualizer):
 
         sep_width = int(0.5 * self.block_w)
 
-        state_vis = np.zeros((self.block_h * self.n_blocks, (sep_width + self.block_w) * self.n_blocks + sep_width, 3))
+        state_vis = np.zeros((int(self.block_h * (self.n_blocks + 1.5)), (sep_width + self.block_w) * self.n_blocks + sep_width, 3))
 
         table_blocks = []
         top_blocks = []
@@ -93,16 +93,24 @@ class BlocksVisualizer(Visualizer):
         for fluent, v in state.items():
             if v:
                 if fluent.name == 'on':
-                    print(f'{fluent.objects[0].name} is on {fluent.objects[1].name}')
                     block = fluent.objects[0].name
                     dest = fluent.objects[1].name
                     top_blocks.append(block)
                     bot_blocks.append(dest)
 
-                elif fluent.name == 'on-table':
+                elif fluent.name == 'ontable':
                     block = fluent.objects[0].name
                     pos = self.blocks.index(block)
                     table_blocks.append((block, pos))
+
+                elif fluent.name == 'holding':
+                    w = int((state_vis.shape[1] / 2) - (self.block_w / 2))
+                    block_n = self.blocks.index(fluent.objects[0].name)
+                    if memory:
+                        img = self.imgs[block_n]
+                    else:
+                        img = self._make_block(self._sample_mnist(block_n))
+                    state_vis[0 : self.block_h, w : w + self.block_w] = img
 
         block_pos = [[] for _ in range(self.n_blocks)]
         for block, pos in table_blocks:
@@ -113,8 +121,6 @@ class BlocksVisualizer(Visualizer):
                 next_pos = self.blocks.index(next_block)
                 block_pos[pos].append(next_pos)
                 curr_block = next_block
-        
-        print(block_pos)
 
         for i, pos in enumerate(block_pos):
             for j, block_n in enumerate(pos):
@@ -165,20 +171,24 @@ class BlocksVisualizer(Visualizer):
 if __name__ == '__main__':
 
     domain_file = "data/pddl/blocks/blocks.pddl"
-    problem_file = "data/pddl/blocks/problems/blocks-5.pddl"
-
+    problem_file = "data/pddl/blocks/problems/blocks2.pddl"
 
     generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=10,
+        plan_len=50,
         num_traces=1
     )
 
     #generator = Generator(dom=domain_file, prob=problem_file)
-
     vis = BlocksVisualizer(generator)
+
+    step = generator.traces[0][30]
+    vis.visualize_state(step, "results/blocks_before.jpg")
+    step = generator.traces[0][31]
+    vis.visualize_state(step, "results/blocks_after.jpg")
+
     #state = generator.tarski_state_to_macq(generator.problem.init)
     #vis.visualize_state(state)
 
-    vis.visualize_trace(generator.traces[0], out_path="results/gifs/blocks_test.gif")
+    vis.visualize_trace(generator.traces[0], out_path="results/gifs/blocks_test.gif", duration=500)

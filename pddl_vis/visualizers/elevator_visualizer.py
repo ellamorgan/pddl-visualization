@@ -5,7 +5,7 @@ import math
 from PIL.Image import Image
 from PIL import Image as Img
 from typing import Union, Tuple, List
-from macq.trace import Step, Trace
+from macq.trace import Step, Trace, State
 from macq.generate.pddl import StateEnumerator, VanillaSampling
 from .base_visualizer import Visualizer
 
@@ -136,7 +136,7 @@ class ElevatorVisualizer(Visualizer):
 
     def visualize_state(
         self, 
-        step: Step, 
+        state: Union[Step, State], 
         out_path: Union[str, None] = None, 
         memory: bool = False, 
         size: Union[Tuple[int, int], None] = None, 
@@ -229,16 +229,13 @@ if __name__ == '__main__':
     generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=3,
+        plan_len=50,
         num_traces=1
     )
 
     vis = ElevatorVisualizer(generator)
 
-    random.seed(0)
-
-    vis.visualize_trace(generator.traces[0], out_path="results/gifs/elevator_seed_test1.gif", memory=False)
-
-    random.seed(0)
-
-    vis.visualize_trace(generator.traces[0], out_path="results/gifs/elevator_seed_test2.gif", memory=False)
+    step = generator.traces[0][30]
+    vis.visualize_state(step, "results/elevator_before.jpg")
+    step = generator.traces[0][31]
+    vis.visualize_state(step, "results/elevator_after.jpg")

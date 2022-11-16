@@ -6,7 +6,7 @@ from PIL import Image as Img
 import math
 from typing import Union, Tuple, List
 from macq.trace import State, Step, Trace
-from macq.generate.pddl import Generator, StateEnumerator
+from macq.generate.pddl import Generator, StateEnumerator, VanillaSampling
 from .base_visualizer import Visualizer
 
 
@@ -261,17 +261,16 @@ if __name__ == '__main__':
     domain_file = "data/pddl/grid/grid.pddl"
     problem_file = "data/pddl/grid/problems/grid1.pddl"
 
-    generator = StateEnumerator(
+    generator = VanillaSampling(
         dom=domain_file, 
-        prob=problem_file
+        prob=problem_file,
+        plan_len=50,
+        num_traces=1
     )
 
     vis = GridVisualizer(generator)
 
-    img1, img2 = vis.create_dataset(n_samples=2, inds=[0], seed=1)[0]
-    img3, img4 = vis.create_dataset(n_samples=2, inds=[0], seed=1)[0]
-
-    img1.save("results/seed_test_1_1.jpg")
-    img2.save("results/seed_test_2_1.jpg")
-    img3.save("results/seed_test_1_2.jpg")
-    img4.save("results/seed_test_2_2.jpg")
+    step = generator.traces[0][30]
+    vis.visualize_state(step, "results/grid_before.jpg")
+    step = generator.traces[0][31]
+    vis.visualize_state(step, "results/grid_after.jpg")
