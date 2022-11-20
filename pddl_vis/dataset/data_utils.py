@@ -49,7 +49,7 @@ def prepare_dataloader(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True,
-        drop_last=True,
+        drop_last=False,
         collate_fn=train_collate,
     )
 
@@ -61,7 +61,7 @@ def prepare_dataloader(
             batch_size=batch_size,
             num_workers=num_workers,
             pin_memory=True,
-            drop_last=True,
+            drop_last=False,
             collate_fn=test_collate,
         )
         loaders.append(val_loader)
@@ -72,7 +72,7 @@ def prepare_dataloader(
             batch_size=batch_size,
             num_workers=num_workers,
             pin_memory=True,
-            drop_last=True,
+            drop_last=False,
             collate_fn=test_collate,
         )
         loaders.append(test_loader)
