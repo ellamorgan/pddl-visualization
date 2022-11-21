@@ -26,7 +26,7 @@ def generate_data(trace, vis, img_size):
 
 
 
-def colour_state(state, state_mapping, graph, colour='#bababa'):
+def colour_state(state, graph, colour='#bababa'):
     graph = graph.copy()
     graph.nodes[state]['style'] = 'filled'
     graph.nodes[state]['fillcolor'] = colour
@@ -69,7 +69,7 @@ def trace_pred_main(model, domain_file, problem_file, n_data, batch_size, vis, i
     for step in trace_generator.traces[0]:
         state_num = state_hashes.index(hash(str(step.state)))
         trace_states.append(state_num)
-        trace_imgs.append(graph_to_img(colour_state(state_num, state_mapping, state_graph)))
+        trace_imgs.append(graph_to_img(colour_state(state_num, state_graph)))
     
     for i in range(len(trace_states) - 1):
         assert state_graph.has_edge(trace_states[i], trace_states[i + 1])
@@ -90,13 +90,16 @@ def trace_pred_main(model, domain_file, problem_file, n_data, batch_size, vis, i
     pred_inds = np.array(trace_preds)       # (n_data, top_n)
     print(pred_inds.shape)
     print(logits.shape)
-    pred_logits = np.array([logit[ind]] for logit, ind in zip(logits, pred_inds))
+    pred_logits = np.array([logits[i][pred_inds[i]] for i in range(len(logits))])
     print(pred_logits.shape)
 
-    for inds, logits in zip(pred_inds, pred_logits):
+    for inds, logits, label in zip(pred_inds, pred_logits, trace_states):
 
         state_pred = inds[np.argmax(logits)]
-        pred_imgs.append(graph_to_img(colour_state(state_pred, state_mapping, state_graph)))
+        if state_pred == label:
+            pred_imgs.append(graph_to_img(colour_state(state_pred, state_graph, colour='#34eb6e')))
+        else:
+            pred_imgs.append(graph_to_img(colour_state(state_pred, state_graph, colour='#eb343d')))
     
 
     imgs = []

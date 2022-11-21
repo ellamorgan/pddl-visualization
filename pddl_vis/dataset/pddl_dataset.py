@@ -1,9 +1,8 @@
 from typing import List, Tuple, Union
 from torch.utils.data.dataset import Dataset
-from macq.generate.pddl import StateEnumerator
 import math
-import numpy as np
 from pddl_vis.utils import get_combination
+from pddl_vis.dataset import process_img
 from pddl_vis.visualizers import Visualizer
 
 
@@ -19,10 +18,7 @@ class PDDLDataset(Dataset):
         seed : Union[int, None] = None,
     ) -> None:
 
-        def preprocess(img):
-            return (np.array(img).transpose((2, 0, 1)) / 127.5) - 1
-            
-        self.data = visualizer.create_dataset(n_samples=n_samples, preprocess=preprocess, img_size=img_size, seed=seed)
+        self.data = visualizer.create_dataset(n_samples=n_samples, preprocess=process_img, img_size=img_size, seed=seed)
         self.targets = list(range(len(self.data)))
         self.n_states = len(self.data)
         self.n_samples = n_samples

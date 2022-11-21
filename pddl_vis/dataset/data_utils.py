@@ -18,7 +18,6 @@ def get_domain(domain, domain_file, problem_file, vis_args = {}):
     return visualizer, n_states
 
 
-
 def prepare_dataloader(
     train_dataset: Dataset,
     val_dataset: Optional[Dataset] = None,
@@ -78,3 +77,21 @@ def prepare_dataloader(
         loaders.append(test_loader)
 
     return loaders
+
+
+def process_img(img):
+        array_from_img = np.asarray(img).transpose(2, 0, 1)
+        normalized = (array_from_img / 127.5) - 1
+        return normalized
+
+
+def visualize_trace(trace, vis, img_size):
+
+    # Get visualizations
+    state_vis = []
+    for step in trace:
+        state_vis.append(process_img(vis(step, size=img_size)))
+    state_vis = np.array(state_vis)
+
+    # state_vis: (n_data, 3, img_w, img_h)
+    return state_vis

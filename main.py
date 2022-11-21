@@ -1,6 +1,7 @@
 import os
 from pddl_vis.utils import load_args, clustering_test
 from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain
+from pddl_vis.aligning import greedy_align
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -11,11 +12,6 @@ from solo.utils.misc import make_contiguous
 from solo.methods import METHODS
 from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
-
-from experiments.val_vis_test import predict_vis_trace
-from experiments.edge_weights import learn_edges
-from experiments.pred_edge_weights import train_edge_network
-from experiments.trace_aligning import trace_pred_main
 
 import numpy as np
 
@@ -119,16 +115,16 @@ def main():
         x, l = batch
         out = model(x)
         print(len(x))
-        embeddings.append(out['feats'].detach().numpy())
-        labels.append(l.detach().numpy())
+        embeddings += list(out['feats'].detach().numpy())
+        labels += list(l.detach().numpy())
     
-    embeddings = np.array(embeddings)[0]    # (1, 256, 512)  
-    labels = np.array(labels)[0]            # (1, 256)
+    embeddings = np.array(embeddings)    # (data_size, 512)  
+    labels = np.array(labels)            # (data_size)
 
     homogeneity, completeness, v_measure = clustering_test(embeddings, labels, n_states)
 
-    n_data = 10
-    before_accuracy, after_accuracy, before_in_graph, after_in_graph = trace_pred_main(model, domain_file, problem_file, n_data, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
+    if args.trace_len > 0:
+        before_accuracy, after_accuracy, before_in_graph, after_in_graph = greedy_align(model, domain_file, problem_file, args.trace_len, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
 
     '''
     if args.wandb:

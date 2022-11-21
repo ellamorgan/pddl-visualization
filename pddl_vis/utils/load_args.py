@@ -43,6 +43,8 @@ def load_args():
     parser.add_argument("--img_h", type=int)
     parser.add_argument("--img_w", type=int)
 
+    parser.add_argument("--trace_len", type=int, default=0)
+
     # add auto checkpoint/umap args
     parser.add_argument("--save_checkpoint", action="store_true")
     parser.add_argument("--auto_umap", action="store_true")

@@ -2,7 +2,20 @@ import numpy as np
 import networkx as nx
 import torch
 from macq.generate.pddl import StateEnumerator, VanillaSampling
+from PIL import Image
+from io import BytesIO
 
+
+def graph_to_img(graph):
+    dot_graph = nx.nx_pydot.to_pydot(graph)
+    img = Image.open(BytesIO(dot_graph.create_png()))
+    return img
+
+
+def colour_state(state, graph, colour='#bababa'):
+    graph.nodes[state]['style'] = 'filled'
+    graph.nodes[state]['fillcolor'] = colour
+    return graph
 
 
 def generate_data(trace, vis, img_size):
@@ -37,6 +50,9 @@ def trace_pred_main(model, domain_file, problem_file, n_data, batch_size, vis, i
 
     state_mapping = dict(zip(states, range(len(states))))
     state_graph = nx.relabel_nodes(graph_generator.graph, state_mapping)
+
+    for _, _, act in state_graph.edges(data=True):
+        act['label'] = ""
 
     trace_generator = VanillaSampling(
         dom=domain_file, 
@@ -135,5 +151,17 @@ def trace_pred_main(model, domain_file, problem_file, n_data, batch_size, vis, i
     
     print(f"Before: {before_in_graph:.2f}% in the graph")
     print(f"After:  {after_in_graph:.2f}% in the graph")
+
+
+    graph_imgs = []
+    for top_pred, align_pred, truth in zip(preds[:, 0], state_pred, trace_states):
+        curr_graph = state_graph.copy()
+        curr_graph = colour_state(top_pred, curr_graph, colour='#eb343d')
+        curr_graph = colour_state(align_pred, curr_graph, colour='#4c34eb')
+        curr_graph = colour_state(truth, curr_graph, colour='#34eb6e')
+        graph_imgs.append(graph_to_img(curr_graph))
+    
+    state_graph_path = 'results/gifs/trace_preds.gif'
+    graph_imgs[0].save(state_graph_path, save_all=True, append_images=graph_imgs[1:], duration=500, loop=0)
 
     return before_accuracy, after_accuracy, before_in_graph, after_in_graph
