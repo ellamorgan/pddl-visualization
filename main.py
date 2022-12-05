@@ -121,12 +121,12 @@ def main():
 
     homogeneity, completeness, v_measure = clustering_test(embeddings, labels, n_states)
 
-    '''
+
     n_traces = 100
     trace_len = 10
 
     # Get one long trace to break into trace_len sizes
-    state_graph, traces, trace_states = get_graph_and_traces(
+    state_graph, traces, states = get_graph_and_traces(
         domain_file, 
         problem_file, 
         n_traces=1, 
@@ -136,38 +136,41 @@ def main():
     # (1, trace_len * n_traces, *img_shape)
     data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
 
-    pred_logits = get_trace_predictions(model, data, batch_size=args.batch_size)
+    preds, logits = get_trace_predictions(model, data, batch_size=args.batch_size)
 
     # (n_traces, trace_len, n_states)
-    pred_logits = pred_logits.reshape((n_traces, trace_len, *pred_logits.shape[2:]))
-    trace_states = trace_states.reshape((n_traces, trace_len))
+    logits = logits.reshape((n_traces, trace_len, *logits.shape[2:]))
+    states = states.reshape((n_traces, trace_len))
 
-    branch_and_bound_align(state_graph, trace_states, pred_logits)
 
-    greedy_align(state_graph, trace_states, pred_logits, top_n=int(n_states / 10))
-    '''
+    top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / len(states)
 
-    print(f"There are {n_states} states")
-
-    before_accuracy, after_accuracy, before_in_graph, after_in_graph = greedy_align(
-        model, 
-        domain_file, 
-        problem_file, 
-        n_data=5*n_states, 
-        batch_size=args.batch_size, 
-        vis=visualizer.visualize_state, 
-        img_size=(args.img_h, args.img_w), 
-        top_n=max(5, int(n_states / 10))
+    greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
+        state_graph, 
+        states, 
+        preds, 
+        logits, 
+        top_n=int(n_states / 10)
     )
 
+    bnb_accuracy = branch_and_bound_align(
+        state_graph, 
+        states, 
+        preds, 
+        logits, 
+        top_n=int(n_states / 10)
+    )
+
+
     wandb.log({
-        'before_accuracy' : before_accuracy, 
-        'after_accuracy' : after_accuracy, 
-        'before_in_graph' : before_in_graph, 
-        'after_in_graph' : after_in_graph,
-        'homogeneity' : homogeneity, 
-        'completeness' : completeness, 
-        'v_measure' : v_measure
+        'top_1_accuracy'  : top_1_accuracy, 
+        'greedy_accuracy' : greedy_accuracy, 
+        'bnb_accuracy'    : bnb_accuracy,
+        'top_1_in_graph'  : top_1_in_graph, 
+        'greedy_in_graph' : greedy_in_graph,
+        'homogeneity'     : homogeneity, 
+        'completeness'    : completeness, 
+        'v_measure'       : v_measure
     })
 
 

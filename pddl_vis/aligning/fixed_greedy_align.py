@@ -11,7 +11,8 @@ def find_next(ind, preds, pred_selected, state_graph):
             pred_selected[ind + 1] = state
             break
     return pred_selected
-        
+
+
 def find_edge(ind, preds, pred_logits, pred_selected, state_graph):
 
     best = -1000

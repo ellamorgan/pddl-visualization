@@ -36,7 +36,7 @@ def get_graph_and_traces(domain_file, problem_file, n_traces, trace_len):
     
     return state_graph, trace_generator.traces, np.array(trace_states)
 
-
+'''
 def get_predictions(model, data, batch_size, top_n):
 
     epochs = int(len(data) // batch_size)
@@ -61,11 +61,13 @@ def get_predictions(model, data, batch_size, top_n):
     print(pred_logits.shape)
 
     return preds, pred_logits
+'''
 
 
 def get_trace_predictions(model, data, batch_size):
 
     trace_logits = []
+    trace_preds = []
 
     trace_epochs = int(len(data[0]) // batch_size)
     if len(data) % batch_size != 0:
@@ -73,14 +75,16 @@ def get_trace_predictions(model, data, batch_size):
 
     for trace in data:    
         trace_logits.append([])
+        trace_preds.append([])
 
         for epoch in range(trace_epochs):
             batch = trace[epoch * batch_size : (epoch + 1) * batch_size]
             x = torch.tensor(batch).float()
             logits = model(x)['logits'].detach().numpy()
             trace_logits[-1] += list(logits)
+            trace_preds[-1] += list(map(np.argsort, -1 * logits))
 
     trace_logits = np.array(trace_logits)       # (n_traces, trace_len, n_states)
-    print(trace_logits.shape)
+    trace_preds = np.array(trace_preds)
 
-    return trace_logits
+    return trace_preds, trace_logits

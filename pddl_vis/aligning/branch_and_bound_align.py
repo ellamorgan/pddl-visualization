@@ -30,14 +30,47 @@ for n1 in G, sorted decending by Pr(s1, n1):
         continue
 '''
 
+'''
+def score(seq_logits):
+    if len(seq_logits) == 0:
+        return 0
+    return np.prod([math.e ** logit for logit in seq_logits])
+
+
+def find_next(seq, score, trace_logits, state_graph, best_score):
+
+    next_nodes = list(state_graph.neighbors(seq[-1]))
+    next_logits = trace_logits[len(seq)][next_nodes]
+
+    sorted_logit_inds = np.argsort(-1 * next_logits)
+
+    for ind in sorted_logits_inds:
+        node = next_nodes[ind]
+        logit = next_logits[ind]
+
+
+
+def branch_and_bound(state_graph, states, preds, logits, top_n):
+
+    for trace_preds, trace_logits in zip(preds, logits):
+
+        best_score = 0
+        best_seq
+
+        for first_state in trace_preds[0][:top_n]:
+
+            curr_score = math.e ** trace_logits[0][first_state]
+
+            if curr_score < best_score:
+                break
+
+            best_score, best_seq = find_next()
+'''
+
+
+
 best_score = 0
 best_seq = []
-
-
-def score(seq, logits):
-    if len(seq) == 0:
-        return 0
-    return np.prod([math.e ** logits[i] for i in seq])
 
 
 def find_next(seq, state_graph, trace_logits, step, best_score, best_seq):
