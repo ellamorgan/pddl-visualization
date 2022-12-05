@@ -4,9 +4,9 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 1000000000
 from io import BytesIO
 
-domain = 'slide_tile'
+domain = 'hanoi'
 
-for problem in ['slide_tile2']:
+for problem in ['hanoi1', 'hanoi2', 'hanoi3']:
 
     domain_file = 'data/pddl/' + domain + '/' + domain + '.pddl'
     problem_file = 'data/pddl/' + domain + '/problems/' + problem + '.pddl'

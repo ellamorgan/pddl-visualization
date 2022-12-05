@@ -126,18 +126,11 @@ class HanoiVisualizer(Visualizer):
 if __name__ == '__main__':
 
     domain_file = "data/pddl/hanoi/hanoi.pddl"
-    problem_file = "data/pddl/hanoi/problems/hanoi-4.pddl"
+    problem_file = "data/pddl/hanoi/problems/hanoi3.pddl"
 
     generator = VanillaSampling(
         dom=domain_file, 
         prob=problem_file,
-        plan_len=50,
+        plan_len=5120,
         num_traces=1
     )
-
-    vis = HanoiVisualizer(generator)
-
-    step = generator.traces[0][30]
-    vis.visualize_state(step, "results/hanoi_before.jpg")
-    step = generator.traces[0][31]
-    vis.visualize_state(step, "results/hanoi_after.jpg")

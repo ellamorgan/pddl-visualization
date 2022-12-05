@@ -48,7 +48,7 @@ def prepare_dataloader(
         shuffle=True,
         num_workers=num_workers,
         pin_memory=True,
-        drop_last=False,
+        drop_last=True,
         collate_fn=train_collate,
     )
 
@@ -94,4 +94,18 @@ def visualize_trace(trace, vis, img_size):
     state_vis = np.array(state_vis)
 
     # state_vis: (n_data, 3, img_w, img_h)
+    return state_vis
+
+
+def visualize_traces(traces, vis, img_size):
+
+    # Get visualizations
+    state_vis = []
+    for trace in traces:
+        state_vis.append([])
+        for step in trace:
+            state_vis[-1].append(process_img(vis(step, size=img_size)))
+    state_vis = np.array(state_vis)
+
+    # state_vis: (n_traces, n_data, 3, img_w, img_h)
     return state_vis

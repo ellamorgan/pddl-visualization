@@ -1,7 +1,7 @@
 import os
 from pddl_vis.utils import load_args, clustering_test
-from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain
-from pddl_vis.aligning import greedy_align
+from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain, visualize_traces
+from pddl_vis.aligning import branch_and_bound_align, greedy_align, get_graph_and_traces, get_trace_predictions
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -14,6 +14,7 @@ from solo.utils.auto_resumer import AutoResumer
 from solo.utils.checkpointer import Checkpointer
 
 import numpy as np
+import wandb
 
 
 def main():
@@ -109,12 +110,9 @@ def main():
     embeddings = []
     labels = []
 
-    print("Test loader:", len(test_loader))
-
     for batch in test_loader:
         x, l = batch
         out = model(x)
-        print(len(x))
         embeddings += list(out['feats'].detach().numpy())
         labels += list(l.detach().numpy())
     
@@ -123,20 +121,54 @@ def main():
 
     homogeneity, completeness, v_measure = clustering_test(embeddings, labels, n_states)
 
-    if args.trace_len > 0:
-        before_accuracy, after_accuracy, before_in_graph, after_in_graph = greedy_align(model, domain_file, problem_file, args.trace_len, args.batch_size, visualizer.visualize_state, (args.img_h, args.img_w))
-
     '''
-    if args.wandb:
-        wandb_logger.run.summary['homogeneity'] = 100 * homogeneity
-        wandb_logger.run.summary['completeness'] = 100 * completeness
-        wandb_logger.run.summary['v_measure'] = 100 * v_measure
+    n_traces = 100
+    trace_len = 10
 
-        wandb_logger.run.summary['before_accuracy'] = before_accuracy
-        wandb_logger.run.summary['after_accuracy'] = after_accuracy
-        wandb_logger.run.summary['before_in_graph'] = before_in_graph
-        wandb_logger.run.summary['after_in_graph'] = after_in_graph
+    # Get one long trace to break into trace_len sizes
+    state_graph, traces, trace_states = get_graph_and_traces(
+        domain_file, 
+        problem_file, 
+        n_traces=1, 
+        trace_len=n_traces * trace_len
+    )
+
+    # (1, trace_len * n_traces, *img_shape)
+    data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
+
+    pred_logits = get_trace_predictions(model, data, batch_size=args.batch_size)
+
+    # (n_traces, trace_len, n_states)
+    pred_logits = pred_logits.reshape((n_traces, trace_len, *pred_logits.shape[2:]))
+    trace_states = trace_states.reshape((n_traces, trace_len))
+
+    branch_and_bound_align(state_graph, trace_states, pred_logits)
+
+    greedy_align(state_graph, trace_states, pred_logits, top_n=int(n_states / 10))
     '''
+
+    print(f"There are {n_states} states")
+
+    before_accuracy, after_accuracy, before_in_graph, after_in_graph = greedy_align(
+        model, 
+        domain_file, 
+        problem_file, 
+        n_data=5*n_states, 
+        batch_size=args.batch_size, 
+        vis=visualizer.visualize_state, 
+        img_size=(args.img_h, args.img_w), 
+        top_n=max(5, int(n_states / 10))
+    )
+
+    wandb.log({
+        'before_accuracy' : before_accuracy, 
+        'after_accuracy' : after_accuracy, 
+        'before_in_graph' : before_in_graph, 
+        'after_in_graph' : after_in_graph,
+        'homogeneity' : homogeneity, 
+        'completeness' : completeness, 
+        'v_measure' : v_measure
+    })
 
 
 if __name__ == '__main__':

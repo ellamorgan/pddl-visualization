@@ -19,9 +19,9 @@ python3 main.py \
     --lr 0.4 \
     --classifier_lr 0.1 \
     --weight_decay 1e-5 \
-    --batch_size 256 \
+    --batch_size $4 \
     --num_workers 4 \
-    --name simclr-$1-$2-$3 \
+    --name simclr-$1-$2-$3-$4 \
     --project solo-learn \
     --wandb \
     --method simclr \

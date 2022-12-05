@@ -99,6 +99,7 @@ class SlideTileVisualizer(Visualizer):
         if out_path is not None:
             img.save(out_path)
 
+        
         return img
 
 
@@ -116,7 +117,6 @@ if __name__ == '__main__':
 
     vis = SlideTileVisualizer(generator)
 
-    step = generator.traces[0][30]
-    vis.visualize_state(step, "results/slide_tile_before.jpg")
-    step = generator.traces[0][31]
-    vis.visualize_state(step, "results/slide_tile_after.jpg")
+    for i, step in enumerate(generator.traces[0]):
+        vis.visualize_state(step, f"results/slide_tile_{i}_a.jpg")
+        vis.visualize_state(step, f"results/slide_tile_{i}_b.jpg")

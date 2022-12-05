@@ -19,8 +19,8 @@ python3 main.py \
     --scheduler warmup_cosine \
     --lr 0.3 \
     --weight_decay 1e-4 \
-    --batch_size 256 \
-    --name barlow-$1-$2-$3 \
+    --batch_size $4 \
+    --name barlow-$1-$2-$3-$4 \
     --project solo-learn \
     --wandb \
     --method barlow_twins \

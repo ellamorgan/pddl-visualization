@@ -28,6 +28,9 @@ class BlocksVisualizer(Visualizer):
         generator: Generator,
         outline_width : int = 1,
     ) -> None:
+
+        super().__init__(generator)
+
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
         block_h, block_w, _ = self._sample_mnist(0).shape
 

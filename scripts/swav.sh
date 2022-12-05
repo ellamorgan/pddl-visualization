@@ -19,9 +19,9 @@ python3 main.py \
     --min_lr 0.0006 \
     --classifier_lr 0.1 \
     --weight_decay 1e-6 \
-    --batch_size 256 \
+    --batch_size $4 \
     --num_workers 4 \
-    --name swav-$1-$2-$3 \
+    --name swav-$1-$2-$3-$4 \
     --wandb \
     --project solo-learn \
     --method swav \

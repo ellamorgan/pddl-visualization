@@ -5,6 +5,7 @@ from macq.generate.pddl import StateEnumerator, VanillaSampling
 from pddl_vis.utils import graph_to_img, colour_state
 from pddl_vis.dataset import visualize_trace
 from pddl_vis.aligning import get_graph_and_traces, get_predictions
+import matplotlib.pyplot as plt
 
 
 def broken_path_align(model, domain_file, problem_file, n_data, batch_size, vis, img_size, top_n):
@@ -20,10 +21,26 @@ def broken_path_align(model, domain_file, problem_file, n_data, batch_size, vis,
     found = []
 
     # Check if top-1 predictions in graph
-    for pre, suc in zip(preds[:-1, 0], trace_states[1:, 0]):
+    for pre, suc in zip(preds[:-1], preds[1:]):
         if state_graph.has_edge(pre[0], suc[0]):
             found.append(1)
         else:
             found.append(0)
     
-    print(f"{100 * sum(found) / len(found)}\% of edges found")
+    print(f"{100 * sum(found) / len(found):.2f}\% of edges found")
+
+    broken_counter = 0
+    broken_sequences = []
+    for edge in found:
+        if not edge:
+            broken_counter += 1
+        else:
+            if broken_counter > 0:
+                broken_sequences.append(broken_counter)
+                broken_counter = 0
+    
+    plt.clf()
+    plt.hist(broken_sequences, edgecolor='black')
+    plt.xlabel('Seq len')
+    plt.ylabel('Count')
+    plt.savefig('results/hist_test.jpg')

@@ -34,7 +34,7 @@ def get_graph_and_traces(domain_file, problem_file, n_traces, trace_len):
         for step in trace:
             trace_states[-1].append(state_hashes.index(hash(str(step.state))))
     
-    return state_graph, trace_generator.traces, trace_states
+    return state_graph, trace_generator.traces, np.array(trace_states)
 
 
 def get_predictions(model, data, batch_size, top_n):
@@ -52,7 +52,7 @@ def get_predictions(model, data, batch_size, top_n):
         for sample in logits:
             top_n_args = np.argpartition(sample, -top_n)[-top_n:]
             top_n_logits = sample[top_n_args]
-            sorted_inds = np.argsort(top_n_logits)
+            sorted_inds = np.argsort(-1 * top_n_logits)
             trace_preds.append(top_n_args[sorted_inds])
             trace_logits.append(top_n_logits[sorted_inds])
     preds = np.array(trace_preds)       # (n_data, top_n)
@@ -61,3 +61,26 @@ def get_predictions(model, data, batch_size, top_n):
     print(pred_logits.shape)
 
     return preds, pred_logits
+
+
+def get_trace_predictions(model, data, batch_size):
+
+    trace_logits = []
+
+    trace_epochs = int(len(data[0]) // batch_size)
+    if len(data) % batch_size != 0:
+        trace_epochs += 1
+
+    for trace in data:    
+        trace_logits.append([])
+
+        for epoch in range(trace_epochs):
+            batch = trace[epoch * batch_size : (epoch + 1) * batch_size]
+            x = torch.tensor(batch).float()
+            logits = model(x)['logits'].detach().numpy()
+            trace_logits[-1] += list(logits)
+
+    trace_logits = np.array(trace_logits)       # (n_traces, trace_len, n_states)
+    print(trace_logits.shape)
+
+    return trace_logits

@@ -18,6 +18,8 @@ class ElevatorVisualizer(Visualizer):
         div : int = 2
     ) -> None:
 
+        super().__init__(generator)
+
         self.mnist_data = pickle.load(open("data/mnist_data.pkl", "rb"))
 
         atoms = generator.problem.init.as_atoms()

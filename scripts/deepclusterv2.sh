@@ -21,9 +21,9 @@ python3 main.py \
     --warmup_epochs 11 \
     --classifier_lr 0.1 \
     --weight_decay 1e-6 \
-    --batch_size 256 \
+    --batch_size $4 \
     --num_workers 4 \
-    --name deepclusterv2-$1-$2-$3 \
+    --name deepclusterv2-$1-$2-$3-$4 \
     --project solo-learn \
     --wandb \
     --method deepclusterv2 \

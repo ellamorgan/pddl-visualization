@@ -16,14 +16,14 @@ python3 main.py \
     --lr 0.3 \
     --classifier_lr 0.3 \
     --weight_decay 1e-4 \
-    --batch_size 256 \
+    --batch_size $4 \
     --num_workers 4 \
-    --name mocov2plus-$1-$2-$3 \
+    --name mocov2plus-$1-$2-$3-$4 \
     --project solo-learn \
     --wandb \
     --method mocov2plus \
     --proj_hidden_dim 2048 \
-    --queue_size 32768 \
+    --queue_size $4 \
     --temperature 0.2 \
     --base_tau_momentum 0.99 \
     --final_tau_momentum 0.999 \
