@@ -37,7 +37,7 @@ def get_graph_and_traces(domain_file, problem_file, n_traces, trace_len):
     return state_graph, trace_generator.traces, np.array(trace_states)
 
 
-def get_predictions(model, data, batch_size, top_n):
+def get_predictions(model, data, batch_size, top_n=-1):
 
     epochs = int(len(data) // batch_size)
     if len(data) % batch_size != 0:
@@ -45,20 +45,28 @@ def get_predictions(model, data, batch_size, top_n):
 
     trace_preds = []
     trace_logits = []
+
     for epoch in range(epochs):
         batch = data[epoch * batch_size : (epoch + 1) * batch_size]
         x = torch.tensor(batch).float()
         logits = model(x)['logits'].detach().numpy()
+
         for sample in logits:
-            top_n_args = np.argpartition(sample, -top_n)[-top_n:]
-            top_n_logits = sample[top_n_args]
-            sorted_inds = np.argsort(-1 * top_n_logits)
-            trace_preds.append(top_n_args[sorted_inds])
-            trace_logits.append(top_n_logits[sorted_inds])
+
+            if top_n > 0:
+                top_n_args = np.argpartition(sample, -top_n)[-top_n:]
+                top_n_logits = sample[top_n_args]
+                sorted_inds = np.argsort(-1 * top_n_logits)
+                trace_preds.append(top_n_args[sorted_inds])
+                trace_logits.append(top_n_logits[sorted_inds])
+            else:
+                trace_preds.append(np.argsort(-1 * sample))
+                trace_logits.append(sample)
+
     preds = np.array(trace_preds)       # (n_data, top_n)
-    pred_logits = np.array(trace_logits)
-    print(preds.shape)
-    print(pred_logits.shape)
+    logits = np.array(trace_logits)
+
+    return preds, logits
 
 
 

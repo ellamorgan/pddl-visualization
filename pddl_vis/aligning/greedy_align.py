@@ -24,17 +24,17 @@ def find_edge(ind, preds, pred_logits, pred_selected, state_graph, top_n):
     next_best = -1
     found = False
 
-    for i, curr_state in enumerate(preds[ind][:top_n]):
+    for curr_state in preds[ind][:top_n]:
 
-        if found and pred_logits[ind][i] + pred_logits[ind + 1][0] < best:
+        if found and pred_logits[ind][curr_state] + pred_logits[ind + 1][0] < best:
             break
 
-        for j, next_state in enumerate(preds[ind + 1][:top_n]):
-            if found and pred_logits[ind][i] + pred_logits[ind + 1][j] < best:
+        for next_state in preds[ind + 1][:top_n]:
+            if found and pred_logits[ind][curr_state] + pred_logits[ind + 1][next_state] < best:
                 break
 
-            if state_graph.has_edge(curr_state, next_state) and pred_logits[ind][i] + pred_logits[ind + 1][j] > best:
-                best = pred_logits[ind][i] + pred_logits[ind + 1][j]
+            if state_graph.has_edge(curr_state, next_state) and pred_logits[ind][curr_state] + pred_logits[ind + 1][next_state] > best:
+                best = pred_logits[ind][curr_state] + pred_logits[ind + 1][next_state]
                 curr_best = curr_state
                 next_best = next_state
                 found = True
@@ -55,13 +55,13 @@ def find_edge(ind, preds, pred_logits, pred_selected, state_graph, top_n):
 def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
 
     trace_selected = []
+    greedy_found = 0
+    top_1_in_graph = 0
 
     # Use preds to index logits, logits isn't sorted
     for preds, pred_logits in zip(trace_preds, trace_logits):
 
         pred_selected = [-1 for _ in range(len(preds))]
-        greedy_found = 0
-        top_1_in_graph = 0
 
         for i in range(len(preds) - 1):
             if state_graph.has_edge(preds[i, 0], preds[i + 1, 0]):
@@ -84,10 +84,10 @@ def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
     greedy_in_graph = 100 * greedy_found / ((trace_states.shape[1] - 1) * trace_states.shape[0])
     
     print()
-    print(f"Top-1: {top_1_accuracy:.2f}% correct")
-    print(f"Greedy:  {greedy_accuracy:.2f}% correct")
+    print(f"Top-1 accuracy: {top_1_accuracy:.2f}%")
+    print(f"Greedy accuracy:  {greedy_accuracy:.2f}%")
     print()
-    print(f"Top-1: {top_1_in_graph:.2f}% in the graph")
-    print(f"Greedy:  {greedy_in_graph:.2f}% in the graph")
+    print(f"Top-1 in graph: {top_1_in_graph:.2f}%")
+    print(f"Greedy in graph:  {greedy_in_graph:.2f}%")
 
     return greedy_accuracy, top_1_in_graph, greedy_in_graph

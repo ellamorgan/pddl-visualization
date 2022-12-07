@@ -1,7 +1,7 @@
 import os
 from pddl_vis.utils import load_args, clustering_test
 from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain, visualize_traces
-from pddl_vis.aligning import branch_and_bound_align, greedy_align, get_graph_and_traces, get_trace_predictions
+from pddl_vis.aligning import branch_and_bound_align, greedy_align, get_graph_and_traces, get_predictions
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -136,14 +136,15 @@ def main():
     # (1, trace_len * n_traces, *img_shape)
     data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
 
-    preds, logits = get_trace_predictions(model, data, batch_size=args.batch_size)
+    preds, logits = get_predictions(model, data[0], batch_size=args.batch_size)
 
     # (n_traces, trace_len, n_states)
-    logits = logits.reshape((n_traces, trace_len, *logits.shape[2:]))
+    preds = preds.reshape((n_traces, trace_len, *preds.shape[1:]))
+    logits = logits.reshape((n_traces, trace_len, *logits.shape[1:]))
     states = states.reshape((n_traces, trace_len))
 
 
-    top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / len(states)
+    top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / states.size
 
     greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
         state_graph, 
