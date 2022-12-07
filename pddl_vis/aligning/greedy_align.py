@@ -51,11 +51,12 @@ def find_edge(ind, preds, pred_logits, pred_selected, state_graph, top_n):
 
 
 
-
+# Randomize
 def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
 
     trace_selected = []
 
+    # Use preds to index logits, logits isn't sorted
     for preds, pred_logits in zip(trace_preds, trace_logits):
 
         pred_selected = [-1 for _ in range(len(preds))]
@@ -76,15 +77,16 @@ def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
 
         trace_selected.append(pred_selected)
         
-    top_1_accuracy = 100 * np.sum(trace_preds[:, :, 0] == np.array(trace_states)) / len(trace_states)
-    greedy_accuracy = 100 * np.sum(np.array(trace_selected) == np.array(trace_states)) / len(trace_states)
+    top_1_accuracy = 100 * np.sum(trace_preds[:, :, 0] == trace_states) / trace_states.size
+    greedy_accuracy = 100 * np.sum(np.array(trace_selected) == trace_states) / trace_states.size
 
     top_1_in_graph = 100 * top_1_in_graph / ((trace_states.shape[1] - 1) * trace_states.shape[0])
     greedy_in_graph = 100 * greedy_found / ((trace_states.shape[1] - 1) * trace_states.shape[0])
     
+    print()
     print(f"Top-1: {top_1_accuracy:.2f}% correct")
     print(f"Greedy:  {greedy_accuracy:.2f}% correct")
-    
+    print()
     print(f"Top-1: {top_1_in_graph:.2f}% in the graph")
     print(f"Greedy:  {greedy_in_graph:.2f}% in the graph")
 

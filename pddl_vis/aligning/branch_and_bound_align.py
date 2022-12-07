@@ -30,50 +30,72 @@ for n1 in G, sorted decending by Pr(s1, n1):
         continue
 '''
 
-'''
-def score(seq_logits):
-    if len(seq_logits) == 0:
-        return 0
-    return np.prod([math.e ** logit for logit in seq_logits])
 
-
-def find_next(seq, score, trace_logits, state_graph, best_score):
+def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
 
     next_nodes = list(state_graph.neighbors(seq[-1]))
     next_logits = trace_logits[len(seq)][next_nodes]
 
     sorted_logit_inds = np.argsort(-1 * next_logits)
 
-    for ind in sorted_logits_inds:
+    last_node = True if len(seq) == len(trace_logits) - 1 else False
+
+    for ind in sorted_logit_inds:
         node = next_nodes[ind]
-        logit = next_logits[ind]
+        prob = math.e ** next_logits[ind]
+
+        new_score = score * prob
+
+        if new_score >= best_score and not last_node:
+            best_score, best_seq = find_next(seq + [node], new_score, trace_logits, state_graph, best_score, best_seq)
+        if last_node and new_score > best_score:
+            best_score = new_score
+            best_seq = seq + [node]
+
+    return best_score, best_seq
 
 
 
 def branch_and_bound(state_graph, states, preds, logits, top_n):
 
+    bnb_preds = []
+
+    # Are the logits sorted? No...
     for trace_preds, trace_logits in zip(preds, logits):
 
         best_score = 0
-        best_seq
+        best_seq = []
 
-        for first_state in trace_preds[0][:top_n]:
+        for first_node in trace_preds[0][:top_n]:
 
-            curr_score = math.e ** trace_logits[0][first_state]
+            score = math.e ** trace_logits[0][first_node]
 
-            if curr_score < best_score:
-                break
+            _, best_seq = find_next([first_node], score, trace_logits, state_graph, best_score, best_seq)
+            bnb_preds.append(best_seq)
+    
+    bnb_accuracy = 100 * np.sum(np.array(bnb_preds) == states) / states.size
 
-            best_score, best_seq = find_next()
+    print()
+    print(f"BnB:  {bnb_accuracy:.2f}% correct")
+
+    return bnb_accuracy
+
+
+
+# Try with trace of random states
+
+
+
+
+
+
+
 '''
-
-
-
 best_score = 0
 best_seq = []
 
 
-def find_next(seq, state_graph, trace_logits, step, best_score, best_seq):
+def _find_next(seq, state_graph, trace_logits, step, best_score, best_seq):
 
     next_nodes = list(state_graph.neighbors(seq[-1]))
     next_logits = trace_logits[step][next_nodes]
@@ -99,7 +121,7 @@ def find_next(seq, state_graph, trace_logits, step, best_score, best_seq):
     return best_score, best_seq
 
 
-def branch_and_bound_align(state_graph, trace_states, pred_logits):
+def _branch_and_bound_align(state_graph, trace_states, pred_logits):
 
     seq_preds = []
     top_1_preds = []
@@ -130,3 +152,4 @@ def branch_and_bound_align(state_graph, trace_states, pred_logits):
     print(f"Branch and bound algorithm accuracy: {bnb_accuracy}%")
 
     return top_1_accuracy, bnb_accuracy
+'''
