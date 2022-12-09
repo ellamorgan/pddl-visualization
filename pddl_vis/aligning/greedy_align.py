@@ -18,6 +18,8 @@ def find_next(ind, preds, pred_selected, state_graph, top_n):
 
 
 def find_edge(ind, preds, pred_logits, pred_selected, state_graph, top_n):
+    # preds is the state predictions, and is sorted most likely > least
+    # pred_logits are the logits, and are not sorted. Need to be indexed by pred
 
     best = -1000
     curr_best = -1
@@ -26,7 +28,7 @@ def find_edge(ind, preds, pred_logits, pred_selected, state_graph, top_n):
 
     for curr_state in preds[ind][:top_n]:
 
-        if found and pred_logits[ind][curr_state] + pred_logits[ind + 1][0] < best:
+        if found and pred_logits[ind][curr_state] + np.max(pred_logits[ind + 1]) < best:
             break
 
         for next_state in preds[ind + 1][:top_n]:
@@ -76,6 +78,9 @@ def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
                 greedy_found += 1
 
         trace_selected.append(pred_selected)
+
+    print(trace_preds[:, :, :top_n])
+    print(trace_selected)
         
     top_1_accuracy = 100 * np.sum(trace_preds[:, :, 0] == trace_states) / trace_states.size
     greedy_accuracy = 100 * np.sum(np.array(trace_selected) == trace_states) / trace_states.size

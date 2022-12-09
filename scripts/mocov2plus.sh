@@ -27,4 +27,5 @@ python3 main.py \
     --temperature 0.2 \
     --base_tau_momentum 0.99 \
     --final_tau_momentum 0.999 \
-    --momentum_classifier
+    --momentum_classifier \
+    --save_checkpoint

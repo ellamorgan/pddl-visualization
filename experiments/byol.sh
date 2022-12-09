@@ -1,4 +1,4 @@
-python3 main.py \
+python3 -m experiments.align_testing \
     --domain $1 \
     --problem $2 \
     --train_samples 20 \
@@ -14,21 +14,21 @@ python3 main.py \
     --optimizer lars \
     --grad_clip_lars \
     --eta_lars 0.02 \
+    --exclude_bias_n_norm_lars \
     --scheduler warmup_cosine \
-    --lr 0.6 \
-    --min_lr 0.0006 \
+    --lr 1.0 \
     --classifier_lr 0.1 \
-    --weight_decay 1e-6 \
+    --weight_decay 1e-5 \
     --batch_size $4 \
     --num_workers 4 \
-    --name swav-$1-$2-$3-$4 \
-    --wandb \
+    --name byol-$1-$2-$3-$4 \
     --project solo-learn \
-    --method swav \
-    --proj_hidden_dim 2048 \
-    --queue_size 3840 \
-    --proj_output_dim 128 \
-    --num_prototypes 3000 \
-    --epoch_queue_starts 50 \
-    --freeze_prototypes_epochs 2 \
+    --wandb \
+    --method byol \
+    --proj_output_dim 256 \
+    --proj_hidden_dim 4096 \
+    --pred_hidden_dim 4096 \
+    --base_tau_momentum 0.99 \
+    --final_tau_momentum 1.0 \
+    --momentum_classifier \
     --save_checkpoint

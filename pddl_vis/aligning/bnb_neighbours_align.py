@@ -1,12 +1,5 @@
 import numpy as np
-import networkx as nx
-import torch
 import math
-from macq.generate.pddl import StateEnumerator, VanillaSampling
-from pddl_vis.utils import graph_to_img, colour_state
-from pddl_vis.dataset import visualize_traces
-from pddl_vis.aligning import get_graph_and_traces, get_trace_predictions
-import matplotlib.pyplot as plt
 
 
 
@@ -35,7 +28,7 @@ def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
 
 
 
-def branch_and_bound_align(state_graph, states, preds, logits, top_n):
+def bnb_neighbours_align(state_graph, states, preds, logits, top_n):
 
     bnb_preds = []
 
@@ -56,15 +49,16 @@ def branch_and_bound_align(state_graph, states, preds, logits, top_n):
         
         bnb_preds.append(best_seq)
     
-    print(np.array(bnb_preds).shape)
+    print(bnb_preds)
     
-    bnb_accuracy = 100 * np.sum(np.array(bnb_preds) == states) / states.size
+    bnb_neighbours_accuracy = 100 * np.sum(np.array(bnb_preds) == states) / states.size
+    print(states)
 
     print()
-    print(f"BnB accuracy:  {bnb_accuracy:.2f}%")
+    print(f"BnB neighbours accuracy:  {bnb_neighbours_accuracy:.2f}%")
     print()
 
-    return bnb_accuracy
+    return bnb_neighbours_accuracy
 
 
 

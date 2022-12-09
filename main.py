@@ -1,7 +1,7 @@
 import os
 from pddl_vis.utils import load_args, clustering_test
 from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain, visualize_traces
-from pddl_vis.aligning import branch_and_bound_align, greedy_align, get_graph_and_traces, get_predictions
+from pddl_vis.aligning import bnb_align, bnb_neighbours_align, greedy_align, get_graph_and_traces, get_predictions
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -99,7 +99,7 @@ def main():
         args,
         logger=wandb_logger if args.wandb else None,
         callbacks=callbacks,
-        default_root_dir='trained_models/swav',
+        default_root_dir='trained_models',
         strategy=DDPStrategy(find_unused_parameters=False)
         if args.strategy == "ddp"
         else args.strategy,
@@ -154,7 +154,15 @@ def main():
         top_n=int(n_states / 10)
     )
 
-    bnb_accuracy = branch_and_bound_align(
+    bnb_accuracy = bnb_align(
+        state_graph, 
+        states, 
+        preds, 
+        logits, 
+        top_n=int(n_states / 10)
+    )
+
+    bnb_n_accuracy = bnb_neighbours_align(
         state_graph, 
         states, 
         preds, 
@@ -167,6 +175,7 @@ def main():
         'top_1_accuracy'  : top_1_accuracy, 
         'greedy_accuracy' : greedy_accuracy, 
         'bnb_accuracy'    : bnb_accuracy,
+        'bnb_n_accuracy'  : bnb_n_accuracy,
         'top_1_in_graph'  : top_1_in_graph, 
         'greedy_in_graph' : greedy_in_graph,
         'homogeneity'     : homogeneity, 

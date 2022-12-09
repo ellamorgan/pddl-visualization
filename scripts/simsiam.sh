@@ -25,4 +25,5 @@ python3 main.py \
     --method simsiam \
     --proj_hidden_dim 2048 \
     --pred_hidden_dim 512 \
-    --proj_output_dim 2048
+    --proj_output_dim 2048 \
+    --save_checkpoint

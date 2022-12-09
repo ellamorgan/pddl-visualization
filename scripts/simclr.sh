@@ -27,4 +27,5 @@ python3 main.py \
     --method simclr \
     --temperature 0.2 \
     --proj_hidden_dim 2048 \
-    --proj_output_dim 256
+    --proj_output_dim 256 \
+    --save_checkpoint

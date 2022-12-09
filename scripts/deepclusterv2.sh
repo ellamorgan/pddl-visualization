@@ -29,4 +29,5 @@ python3 main.py \
     --method deepclusterv2 \
     --proj_hidden_dim 2048 \
     --proj_output_dim 128 \
-    --num_prototypes 3000 3000 3000
+    --num_prototypes 3000 3000 3000 \
+    --save_checkpoint
