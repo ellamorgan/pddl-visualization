@@ -4,6 +4,7 @@ from pddl_vis.aligning import bnb_align, bnb_neighbours_align, greedy_align, get
 from solo.utils.misc import make_contiguous
 from solo.methods import METHODS
 import numpy as np
+import math
 
 
 load_model_path = "trained_models/byol/1yhik0ge/byol-elevator-elevator1-5-128-1yhik0ge-ep=4.ckpt"
@@ -56,6 +57,10 @@ def main():
 
     top_n = max((5, int(n_states / 10)))
 
+    # Turn logits into a probability distribution
+    logits = math.e ** logits / np.sum(math.e ** logits, axis=2)[:, :, np.newaxis]
+
+
     greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
         state_graph, 
         states, 
@@ -72,6 +77,7 @@ def main():
         top_n
     )
 
+    '''
     bnb_n_accuracy = bnb_neighbours_align(
         state_graph, 
         states, 
@@ -79,6 +85,7 @@ def main():
         logits, 
         top_n
     )
+    '''
 
 if __name__ == '__main__':
 

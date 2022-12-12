@@ -7,6 +7,7 @@ from pddl_vis.aligning import get_graph_and_traces, get_predictions
 
 
 def find_next(ind, preds, pred_selected, state_graph, top_n):
+
     # Pred states is (states, top_n) and sorted by highest -> lowest probability
     for state in preds[ind + 1][:top_n]:
         if state_graph.has_edge(pred_selected[ind], state):
@@ -76,10 +77,15 @@ def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
 
             if pred_selected[i + 1] != -1:
                 greedy_found += 1
+            
+        if pred_selected[-1] == -1:
+            pred_selected[-1] = preds[-1][0]
 
         trace_selected.append(pred_selected)
 
+    print("Top n:")
     print(trace_preds[:, :, :top_n])
+    print("\nGreedy selected:")
     print(trace_selected)
         
     top_1_accuracy = 100 * np.sum(trace_preds[:, :, 0] == trace_states) / trace_states.size
