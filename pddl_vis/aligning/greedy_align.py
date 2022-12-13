@@ -82,11 +82,6 @@ def greedy_align(state_graph, trace_states, trace_preds, trace_logits, top_n):
             pred_selected[-1] = preds[-1][0]
 
         trace_selected.append(pred_selected)
-
-    print("Top n:")
-    print(trace_preds[:, :, :top_n])
-    print("\nGreedy selected:")
-    print(trace_selected)
         
     top_1_accuracy = 100 * np.sum(trace_preds[:, :, 0] == trace_states) / trace_states.size
     greedy_accuracy = 100 * np.sum(np.array(trace_selected) == trace_states) / trace_states.size

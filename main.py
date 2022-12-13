@@ -159,7 +159,7 @@ def main():
         states, 
         preds, 
         logits, 
-        top_n=int(n_states / 10)
+        top_n=5
     )
 
     bnb_n_accuracy = bnb_neighbours_align(

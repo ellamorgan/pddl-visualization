@@ -7,7 +7,8 @@ import numpy as np
 import math
 
 
-load_model_path = "trained_models/byol/1yhik0ge/byol-elevator-elevator1-5-128-1yhik0ge-ep=4.ckpt"
+#load_model_path = "trained_models/byol/1yhik0ge/byol-elevator-elevator1-5-128-1yhik0ge-ep=4.ckpt"
+load_model_path = "trained_models/byol/1k20okc5/byol-grid-grid2-5-256-1k20okc5-ep=4.ckpt"
 
 
 def main():
@@ -55,7 +56,7 @@ def main():
 
     top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / states.size
 
-    top_n = max((5, int(n_states / 10)))
+    top_n = 5
 
     # Turn logits into a probability distribution
     logits = math.e ** logits / np.sum(math.e ** logits, axis=2)[:, :, np.newaxis]
