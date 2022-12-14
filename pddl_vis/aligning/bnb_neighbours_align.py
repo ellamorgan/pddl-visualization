@@ -49,12 +49,7 @@ def bnb_neighbours_align(state_graph, states, preds, logits, top_n):
         
         bnb_preds.append(best_seq)
     
-    print("\nBnb neighbours selected:")
-    print(bnb_preds)
-    
     bnb_neighbours_accuracy = 100 * np.sum(np.array(bnb_preds) == states) / states.size
-    print("\nActual:")
-    print(states)
 
     print()
     print(f"BnB neighbours accuracy:  {bnb_neighbours_accuracy:.2f}%")

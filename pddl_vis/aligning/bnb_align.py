@@ -67,6 +67,8 @@ def bnb_align(state_graph, states, preds, logits, top_n):
         best_scores = [0 for _ in range(len(trace_preds))]
         best_seqs = [[] for _ in range(len(trace_preds))]
 
+        longest_seq_length = 0
+
         for first_node in trace_preds[0][:top_n]:
 
             score = trace_logits[0][first_node]   # This doesn't assume trace_logits is sorted
@@ -77,12 +79,29 @@ def bnb_align(state_graph, states, preds, logits, top_n):
                 0,
                 best_scores,
                 best_seqs,
-                0,
+                longest_seq_length,
                 state_graph,
                 trace_preds,
                 trace_logits,
                 top_n
             )
+        
+        '''
+        print()
+        for j, seq in enumerate(best_seqs):
+            if len(seq) == 0:
+                continue
+            for state in seq:
+                print('{:<3}'.format(state), end='')
+            print()
+            for state in states[i]:
+                print('{:<3}'.format(state), end='')
+            print()
+            print("Correct:", np.sum(seq == states[i]))
+            print("Connected:", j)
+            print()
+        print("Longest seq length:", longest_seq_length)
+        '''
         
         state_preds.append(best_seqs[longest_seq_length])
 
