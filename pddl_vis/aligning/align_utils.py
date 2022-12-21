@@ -6,6 +6,8 @@ from macq.generate.pddl import StateEnumerator, VanillaSampling
 
 def get_graph_and_traces(domain_file, problem_file, n_traces, trace_len):
 
+    # TODO: make this a class? Then can access states, graph, etc without always needing to return
+
     generator = StateEnumerator(
         dom=domain_file, 
         prob=problem_file
@@ -34,7 +36,7 @@ def get_graph_and_traces(domain_file, problem_file, n_traces, trace_len):
         for step in trace:
             trace_states[-1].append(state_hashes.index(hash(str(step.state))))
     
-    return state_graph, trace_generator.traces, np.array(trace_states)
+    return state_graph, trace_generator.traces, np.array(trace_states), macq_states
 
 
 def get_predictions(model, data, batch_size):

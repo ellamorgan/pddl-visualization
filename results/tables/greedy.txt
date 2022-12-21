@@ -1,0 +1,54 @@
+model & domain & problem & top-1 accuracy before & accuracy after & in graph before & in graph after & trace length \\
+byol & elevator & elevator1              & 0.4 & 6.6 & 0.0 & 51.25 & 5 \\
+byol & elevator & elevator1              & 0.1 & 2.1 & 0.0 & 45.4 & 10 \\
+deepclusterv2 & elevator & elevator1     & 25.6 & 29.4 & 42.5 & 83.0 & 5 \\
+deepclusterv2 & elevator & elevator1     & 12.1 & 15.2 & 32.3 & 74.9 & 10 \\
+supcon & elevator & elevator1            & 41.6 & 25.4 & 34.0 & 99.75 & 5 \\
+supcon & elevator & elevator1            & 29.1 & 15.4 & 27.7 & 98.4 & 10 \\
+swav & elevator & elevator1              & 38.4 & 36.8 & 54.0 & 94.0 & 5 \\
+swav & elevator & elevator1              & 31.2 & 29.9 & 48.2 & 90.3 & 10 \\
+
+byol & hanoi & hanoi2                    & 60.6 & 68.8 & 48.5 & 98.0 & 5 \\
+byol & hanoi & hanoi2                    & 58.5 & 63.3 & 46.8 & 98.7 & 10 \\
+deepclusterv2 & hanoi & hanoi2           & 94.6 & 99.0 & 89.5 & 100.0 & 5  \\
+deepclusterv2 & hanoi & hanoi2           & 93.8 & 100.0 & 87.9 & 100.0 & 10 \\
+supcon & hanoi & hanoi2                  & 99.4 & 100.0 & 98.75 & 100.0 & 5 \\
+supcon & hanoi & hanoi2                  & 99.8 & 100.0 & 99.7 & 100.0 & 10 \\
+swav & hanoi & hanoi2                    & 74.0 & 80.4 & 65.5 & 99.0 & 5 \\
+swav & hanoi & hanoi2                    & 72.8 & 74.0 & 67.7 & 100.0 & 10 \\
+
+byol & blocks & blocks2                  & 65.2 & 70.0 & 53.0 & 100.0 & 5 \\
+byol & blocks & blocks2                  & 58.5 & 64.5 & 52.1 & 97.9 & 10 \\
+deepclusterv2 & blocks & blocks2         & 96.6 & 100.0 & 93.25 & 100.0 & 5 \\
+deepclusterv2 & blocks & blocks2         & 98.7 & 100.0 & 97.3 & 100.0 & 10 \\
+supcon & blocks & blocks2                & 97.6 & 100.0 & 94.5 & 100.0 & 5 \\
+supcon & blocks & blocks2                & 97.9 & 99.0 & 96.7 & 100.0 & 10 \\
+swav & blocks & blocks2                  & 59.6 & 61.2 & 58.5 & 99.25 & 5 \\
+swav & blocks & blocks2                  & 47.3 & 58.0 & 46.8 & 98.3 & 10 \\
+
+byol & elevator & elevator2              & 12.2 & 0.8 & 13.0 & 99.5 & 5 \\
+byol & elevator & elevator2              & 16.3 & 0.1 & 18.0 & 99.7 & 10 \\
+deepclusterv2 & elevator & elevator2     & 39.0 & 55.2 & 31.5 & 99.75 & 5 \\
+deepclusterv2 & elevator & elevator2     & 32.7 & 45.9 & 27.1 & 99.4 & 10 \\
+supcon & elevator & elevator2            & 84.6 & 92.0 & 77.25 & 99.5 & 5 \\
+supcon & elevator & elevator2            & 85.1 & 92.6 & 72.6 & 99.9 & 10 \\
+swav & elevator & elevator2              & 35.4 & 44.6 & 3.0 & 99.5 & 5 \\
+swav & elevator & elevator2              & 30.4 & 31.7 & 7.0 & 99.4 & 10 \\
+
+byol & slide_tile & slide_tile2          & 37.8 & 38.0 & 20.0 & 99.75 & 5 \\
+byol & slide_tile & slide_tile2          & 38.4 & 44.0 & 26.9 & 99.9 & 10 \\
+deepclusterv2 & slide_tile & slide_tile2 & 95.6 & 100.0 & 91.25 & 100.0 & 5 \\
+deepclusterv2 & slide_tile & slide_tile2 & 93.8 & 99.6 & 87.9 & 99.8 & 10 \\
+supcon & slide_tile & slide_tile2        & 100.0 & 100.0 & 100.0 & 100.0 & 5 \\
+supcon & slide_tile & slide_tile2        & 100.0 & 100.0 & 100.0 & 100.0 & 10 \\
+swav & slide_tile & slide_tile2          & 12.2 & 9.0 & 3.25 & 100.0 & 5 \\
+swav & slide_tile & slide_tile2          & 7.6 & 7.0 & 3.89 & 100.0 & 10 \\
+
+byol & grid & grid3                      & 25.6 & 47.8 & 13.75 & 100.0 & 5 \\
+byol & grid & grid3                      & 27.1 & 53.6 & 11.6 & 99.2 & 10 \\
+deepclusterv2 & grid & grid3             & 34.2 & 69.4 & 11.75 & 98.5 & 5 \\
+deepclusterv2 & grid & grid3             & 30.9 & 60.7 & 12.8 & 97.3 & 10 \\
+supcon & grid & grid3                    & 100.0 & 100.0 & 100.0 & 100.0 & 5 \\
+supcon & grid & grid3                    & 97.3 & 100.0 & 94.9 & 100.0 & 10 \\
+swav & grid & grid3                      & 13.6 & 47.6 & 8.25 & 99.25 & 5 \\
+swav & grid & grid3                      & 21.5 & 48.0 & 15.4 & 99.0 & 10 \\

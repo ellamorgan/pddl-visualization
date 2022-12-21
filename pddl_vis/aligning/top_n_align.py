@@ -1,10 +1,5 @@
 import numpy as np
-import math
-
-
-
-
-
+import time
 
 
 
@@ -19,7 +14,9 @@ def find_next(
     state_graph,
     trace_preds,
     trace_logits,
-    top_n
+    top_n,
+    start_time,
+    time_limit
 ):
     curr_ind = len(seq)
 
@@ -32,6 +29,9 @@ def find_next(
         return best_scores, best_seqs, longest_seq_length
     
     for next_node in trace_preds[curr_ind][:top_n]:
+
+        if time.time() - start_time > time_limit:
+            return 0, 0, 0
 
         next_score = score * trace_logits[curr_ind][next_node]
 
@@ -50,19 +50,23 @@ def find_next(
             state_graph,
             trace_preds,
             trace_logits,
-            top_n
+            top_n,
+            start_time,
+            time_limit
         )
     
     return best_scores, best_seqs, longest_seq_length
 
 
 
-def bnb_align(state_graph, states, preds, logits, top_n):
+def top_n_align(state_graph, states, preds, logits, top_n, time_limit):
 
 
     state_preds = []
 
-    for i, (trace_preds, trace_logits) in enumerate(zip(preds, logits)):
+    start_time = time.time()
+
+    for trace_preds, trace_logits in zip(preds, logits):
 
         best_scores = [0 for _ in range(len(trace_preds))]
         best_seqs = [[] for _ in range(len(trace_preds))]
@@ -83,31 +87,20 @@ def bnb_align(state_graph, states, preds, logits, top_n):
                 state_graph,
                 trace_preds,
                 trace_logits,
-                top_n
+                top_n,
+                start_time,
+                time_limit
             )
         
-        '''
-        print()
-        for j, seq in enumerate(best_seqs):
-            if len(seq) == 0:
-                continue
-            for state in seq:
-                print('{:<3}'.format(state), end='')
-            print()
-            for state in states[i]:
-                print('{:<3}'.format(state), end='')
-            print()
-            print("Correct:", np.sum(seq == states[i]))
-            print("Connected:", j)
-            print()
-        print("Longest seq length:", longest_seq_length)
-        '''
+        if time.time() - start_time > time_limit:
+            return 0, time_limit
         
         state_preds.append(best_seqs[longest_seq_length])
-
+    
+    end_time = time.time()
     
     accuracy = 100 * np.sum(np.array(state_preds) == states) / states.size
 
     print(f"Longest aligning accuracy:  {accuracy:.2f}%")
 
-    return accuracy
+    return accuracy, end_time - start_time

@@ -1,0 +1,54 @@
+name & accuracy before & accuracy after & trace length \\
+byol elevator elevator1 & 0.4 & 0.0 & 5 \\
+byol elevator elevator1 & 0.1 & 0.0 & 10 \\
+deepclusterv2 elevator elevator1 & 25.6 & 30.0 & 5 \\
+deepclusterv2 elevator elevator1 & 12.1 & 13.0 & 10 \\
+supcon elevator elevator1 & 41.6 & 39.0 & 5 \\
+supcon elevator elevator1 & 29.1 & 12.0 & 10 \\
+swav elevator elevator1 & 38.4 & 42.0 & 5 \\
+swav elevator elevator1 & 31.2 & 31.0 & 10 \\
+
+byol hanoi hanoi2 & 60.6 & 58.0 & 5 \\
+byol hanoi hanoi2 & 58.5 & 57.7 & 10 \\
+deepclusterv2 hanoi hanoi2 & 94.6 & 96.0 & 5 \\
+deepclusterv2 hanoi hanoi2 & 93.8 & 94.0 & 10 \\
+supcon hanoi hanoi2 & 99.4 & 100.0 & 5 \\
+supcon hanoi hanoi2 & 99.8 & 99.0 & 10 \\
+swav hanoi hanoi2 & 74.0 & 73.0 & 5 \\
+swav hanoi hanoi2 & 72.8 & 75.0 & 10 \\
+
+byol blocks blocks2 & 65.2 & 63.4 & 5 \\
+byol blocks blocks2 & 58.5 & 63.2 & 10 \\
+deepclusterv2 blocks blocks2 & 96.6 & 98.0 & 5 \\
+deepclusterv2 blocks blocks2 & 98.7 & 99.0 & 10 \\
+supcon blocks blocks2 & 97.6 & 99.0 & 5 \\
+supcon blocks blocks2 & 97.9 & 99.0 & 10 \\
+swav blocks blocks2 & 59.6 & 56.0 & 5 \\
+swav blocks blocks2 & 47.3 & 52.3 & 10 \\
+
+byol elevator elevator2 & 12.2 & 12.0 & 5 \\
+byol elevator elevator2 & 16.3 & 33.0 & 10 \\
+deepclusterv2 elevator elevator2 & 39.0 & 41.6 & 5 \\
+deepclusterv2 elevator elevator2 & 32.7 & 31.0 & 10 \\
+supcon elevator elevator2 & 84.6 & 83.0 & 5 \\
+supcon elevator elevator2 & 85.1 & 92.0 & 10 \\
+swav elevator elevator2 & 35.4 & 36.0 & 5 \\
+swav elevator elevator2 & 30.4 & 58.0 & 10 \\
+
+byol slide_tile slide_tile2 & 37.8 & 31.0 & 5 \\
+byol slide_tile slide_tile2 & 38.4 & 39.0 & 10 \\
+deepclusterv2 slide_tile slide_tile2 & 95.6 & 95.0 & 5 \\
+deepclusterv2 slide_tile slide_tile2 & 93.8 & 93.0 & 10 \\
+supcon slide_tile slide_tile2 & 100.0 & 100.0 & 5 \\
+supcon slide_tile slide_tile2 & 100.0 & 100.0 & 10 \\
+swav slide_tile slide_tile2 & 12.2 & 13.0 & 5 \\
+swav slide_tile slide_tile2 & 7.6 & 7.0 & 10 \\
+
+byol grid grid3 & 25.6 & 33.4 & 5 \\
+byol grid grid3 & 27.1 & 21.9 & 10 \\
+deepclusterv2 grid grid3 & 34.2 & 31.2 & 5 \\
+deepclusterv2 grid grid3 & 30.9 & 34.3 & 10 \\
+supcon grid grid3 & 100.0 & 100.0 & 5 \\
+supcon grid grid3 & 97.3 & 99.0 & 10 \\
+swav grid grid3 & 13.6 & 17.0 & 5 \\
+swav grid grid3 & 21.5 & 16.2 & 10 \\

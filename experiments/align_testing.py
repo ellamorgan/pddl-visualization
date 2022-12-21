@@ -1,6 +1,6 @@
 from pddl_vis.utils import load_args
 from pddl_vis.dataset import get_domain, visualize_traces
-from pddl_vis.aligning import bnb_align, bnb_neighbours_align, greedy_align, get_graph_and_traces, get_predictions
+from pddl_vis.aligning import bnb_align, greedy_align, get_graph_and_traces, get_predictions, neighbours_align
 from solo.utils.misc import make_contiguous
 from solo.methods import METHODS
 import numpy as np
@@ -36,7 +36,7 @@ def main():
     trace_len = 10
 
     # Get one long trace to break into trace_len sizes
-    state_graph, traces, states = get_graph_and_traces(
+    state_graph, traces, states, _ = get_graph_and_traces(
         domain_file, 
         problem_file, 
         n_traces=1, 

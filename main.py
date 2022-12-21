@@ -1,7 +1,7 @@
 import os
-from pddl_vis.utils import load_args, clustering_test
+from pddl_vis.utils import load_args, clustering_test, update_table
 from pddl_vis.dataset import PDDLDataset, prepare_dataloader, get_domain, visualize_traces
-from pddl_vis.aligning import bnb_align, bnb_neighbours_align, greedy_align, get_graph_and_traces, get_predictions
+from pddl_vis.aligning import top_n_align, greedy_align, neighbours_align, get_graph_and_traces, get_predictions, edge_inference
 
 from pytorch_lightning import Trainer
 from pytorch_lightning.callbacks import LearningRateMonitor
@@ -15,6 +15,7 @@ from solo.utils.checkpointer import Checkpointer
 
 import numpy as np
 import wandb
+import random
 
 
 def main():
@@ -107,6 +108,7 @@ def main():
 
     trainer.fit(model, train_loader, val_loader, ckpt_path=ckpt_path)
 
+
     embeddings = []
     labels = []
 
@@ -119,56 +121,111 @@ def main():
     embeddings = np.array(embeddings)    # (data_size, 512)  
     labels = np.array(labels)            # (data_size)
 
+    n_traces, trace_len = 50, n_states
+
+    # Get one long trace to break into trace_len sizes
+    state_graph, traces, states, all_states = get_graph_and_traces(
+        domain_file, 
+        problem_file, 
+        n_traces=n_traces, 
+        trace_len=trace_len
+    )
+
+    random_traces = [random.choices(all_states, trace_len) for _ in range(n_traces)]
+    random_data = visualize_traces(random_traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
+    random_data = random_data.reshape((n_traces * trace_len, *random_data.shape[2:]))
+    random_preds, _ = get_predictions(model, random_data, batch_size=args.batch_size)
+    random_preds = random_preds.reshape((n_traces, trace_len, *preds.shape[1:]))
+
+    data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
+    data = data.reshape((n_traces * trace_len, *data.shape[2:]))
+    preds, logits = get_predictions(model, data, batch_size=args.batch_size)
+    preds = preds.reshape((n_traces, trace_len, *preds.shape[1:]))
+
+    edge_inference(state_graph, preds)
+
+    '''
     homogeneity, completeness, v_measure = clustering_test(embeddings, labels, n_states)
 
 
+    row = args.method + " " + args.domain + " " + args.problem
+
+    update_table(
+        [homogeneity, completeness, v_measure], 
+        row,
+        "results/tables/clustering.txt"
+    )
+
     n_traces = 100
-    trace_len = 10
 
-    # Get one long trace to break into trace_len sizes
-    state_graph, traces, states = get_graph_and_traces(
-        domain_file, 
-        problem_file, 
-        n_traces=1, 
-        trace_len=n_traces * trace_len
-    )
+    for trace_len in [5, 10]:
 
-    # (1, trace_len * n_traces, *img_shape)
-    data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
+        # Get one long trace to break into trace_len sizes
+        state_graph, traces, states = get_graph_and_traces(
+            domain_file, 
+            problem_file, 
+            n_traces=1, 
+            trace_len=n_traces * trace_len
+        )
 
-    preds, logits = get_predictions(model, data[0], batch_size=args.batch_size)
+        # (1, trace_len * n_traces, *img_shape)
+        data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
 
-    # (n_traces, trace_len, n_states)
-    preds = preds.reshape((n_traces, trace_len, *preds.shape[1:]))
-    logits = logits.reshape((n_traces, trace_len, *logits.shape[1:]))
-    states = states.reshape((n_traces, trace_len))
+        preds, logits = get_predictions(model, data[0], batch_size=args.batch_size)
+
+        # (n_traces, trace_len, n_states)
+        preds = preds.reshape((n_traces, trace_len, *preds.shape[1:]))
+        logits = logits.reshape((n_traces, trace_len, *logits.shape[1:]))
+        states = states.reshape((n_traces, trace_len))
 
 
-    top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / states.size
+        top_1_accuracy = 100 * np.sum(preds[:, :, 0] == np.array(states)) / states.size
 
-    greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
-        state_graph, 
-        states, 
-        preds, 
-        logits, 
-        top_n=int(n_states / 10)
-    )
+        greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
+            state_graph, 
+            states, 
+            preds, 
+            logits, 
+            top_n=int(n_states / 10)
+        )
 
-    bnb_accuracy = bnb_align(
-        state_graph, 
-        states, 
-        preds, 
-        logits, 
-        top_n=5
-    )
+        update_table(
+            [top_1_accuracy, greedy_accuracy, top_1_in_graph, greedy_in_graph, trace_len],
+            row,
+            "results/tables/greedy.txt"
+        )
 
-    bnb_n_accuracy = bnb_neighbours_align(
-        state_graph, 
-        states, 
-        preds, 
-        logits, 
-        top_n=int(n_states / 10)
-    )
+        neighbour_accuracy = neighbours_align(
+            state_graph, 
+            states, 
+            preds, 
+            logits, 
+            top_n=int(n_states / 10)
+        )
+
+        update_table(
+            [top_1_accuracy, neighbour_accuracy, trace_len],
+            row,
+            "results/tables/neighbours.txt"
+        )
+
+
+        for top_n in [3, 5]:
+
+            top_n_accuracy, time = top_n_align(
+                state_graph, 
+                states, 
+                preds, 
+                logits, 
+                top_n,
+                time_limit=300
+            )
+
+            update_table(
+                [top_1_accuracy, top_n_accuracy, trace_len, top_n, time],
+                row,
+                "results/tables/brute.txt"
+            )
 
 
     wandb.log({
@@ -182,6 +239,7 @@ def main():
         'completeness'    : completeness, 
         'v_measure'       : v_measure
     })
+    '''
 
 
 if __name__ == '__main__':

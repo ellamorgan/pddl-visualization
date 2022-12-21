@@ -1,0 +1,120 @@
+ & accuracy before & accuracy after & trace length & top n & time \\
+byol elevator elevator1 & 0.4 & 6.2 & 5 & 3 & 0.029753684997558594 \\
+byol elevator elevator1 & 0.4 & 0.0 & 5 & 5 & 0.30949950218200684 \\
+byol elevator elevator1 & 0.1 & 1.7 & 10 & 3 & 7.085748910903931 \\
+byol elevator elevator1 & 0.1 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 elevator elevator1 & 25.6 & 31.8 & 5 & 3 & 0.030460357666015625 \\
+deepclusterv2 elevator elevator1 & 25.6 & 29.0 & 5 & 5 & 0.2884354591369629 \\
+deepclusterv2 elevator elevator1 & 12.1 & 14.5 & 10 & 3 & 7.227258205413818 \\
+deepclusterv2 elevator elevator1 & 12.1 & 0 & 10 & 5 & 300 \\
+
+supcon elevator elevator1 & 41.6 & 23.0 & 5 & 3 & 0.029563188552856445 \\
+supcon elevator elevator1 & 41.6 & 23.0 & 5 & 5 & 0.27812623977661133 \\
+supcon elevator elevator1 & 29.1 & 12.8 & 10 & 3 & 7.112112998962402 \\
+supcon elevator elevator1 & 29.1 & 0 & 10 & 5 & 300 \\
+
+swav elevator elevator1 & 38.4 & 37.0 & 5 & 3 & 0.03046560287475586 \\
+swav elevator elevator1 & 38.4 & 36.0 & 5 & 5 & 0.2929055690765381 \\
+swav elevator elevator1 & 31.2 & 26.3 & 10 & 3 & 7.259296894073486 \\
+swav elevator elevator1 & 31.2 & 0 & 10 & 5 & 300 \\
+
+byol hanoi hanoi2 & 60.6 & 75.2 & 5 & 3 & 0.030370235443115234 \\
+byol hanoi hanoi2 & 60.6 & 78.0 & 5 & 5 & 0.2907869815826416 \\
+byol hanoi hanoi2 & 58.5 & 62.8 & 10 & 3 & 7.292528867721558 \\
+byol hanoi hanoi2 & 58.5 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 hanoi hanoi2 & 94.6 & 100.0 & 5 & 3 & 0.0301668643951416 \\
+deepclusterv2 hanoi hanoi2 & 94.6 & 100.0 & 5 & 5 & 0.2888143062591553 \\
+deepclusterv2 hanoi hanoi2 & 93.8 & 98.6 & 10 & 3 & 7.2380149364471436 \\
+deepclusterv2 hanoi hanoi2 & 93.8 & 0 & 10 & 5 & 300 \\
+
+supcon hanoi hanoi2 & 99.4 & 100.0 & 5 & 3 & 0.02946162223815918 \\
+supcon hanoi hanoi2 & 99.4 & 100.0 & 5 & 5 & 0.28433990478515625 \\
+supcon hanoi hanoi2 & 99.8 & 100.0 & 10 & 3 & 7.0719544887542725 \\
+supcon hanoi hanoi2 & 99.8 & 0 & 10 & 5 & 300 \\
+
+swav hanoi hanoi2 & 74.0 & 83.2 & 5 & 3 & 0.030035972595214844 \\
+swav hanoi hanoi2 & 74.0 & 84.0 & 5 & 5 & 0.2836942672729492 \\
+swav hanoi hanoi2 & 72.8 & 75.9 & 10 & 3 & 7.363813877105713 \\
+swav hanoi hanoi2 & 72.8 & 0 & 10 & 5 & 300 \\
+
+byol blocks blocks2 & 65.2 & 75.0 & 5 & 3 & 0.029441356658935547 \\
+byol blocks blocks2 & 65.2 & 77.0 & 5 & 5 & 0.27912187576293945 \\
+byol blocks blocks2 & 58.5 & 76.6 & 10 & 3 & 7.003342390060425 \\
+byol blocks blocks2 & 58.5 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 blocks blocks2 & 96.6 & 100.0 & 5 & 3 & 0.03060173988342285 \\
+deepclusterv2 blocks blocks2 & 96.6 & 100.0 & 5 & 5 & 0.28714656829833984 \\
+deepclusterv2 blocks blocks2 & 98.7 & 100.0 & 10 & 3 & 7.230926513671875 \\
+deepclusterv2 blocks blocks2 & 98.7 & 0 & 10 & 5 & 300 \\
+
+supcon blocks blocks2 & 97.6 & 99.0 & 5 & 3 & 0.029802322387695312 \\
+supcon blocks blocks2 & 97.6 & 100.0 & 5 & 5 & 0.27967405319213867 \\
+supcon blocks blocks2 & 97.9 & 98.9 & 10 & 3 & 7.1207709312438965 \\
+supcon blocks blocks2 & 97.9 & 0 & 10 & 5 & 300 \\
+
+swav blocks blocks2 & 59.6 & 72.4 & 5 & 3 & 0.031517744064331055 \\
+swav blocks blocks2 & 59.6 & 70.6 & 5 & 5 & 0.29761767387390137 \\
+swav blocks blocks2 & 47.3 & 57.9 & 10 & 3 & 7.296978950500488 \\
+swav blocks blocks2 & 47.3 & 0 & 10 & 5 & 300 \\
+
+byol elevator elevator2 & 12.2 & 5.6 & 5 & 3 & 0.031013011932373047 \\
+byol elevator elevator2 & 12.2 & 3.8 & 5 & 5 & 0.299487829208374 \\
+byol elevator elevator2 & 16.3 & 6.3 & 10 & 3 & 7.381047010421753 \\
+byol elevator elevator2 & 16.3 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 elevator elevator2 & 39.0 & 51.0 & 5 & 3 & 0.030681848526000977 \\
+deepclusterv2 elevator elevator2 & 39.0 & 60.0 & 5 & 5 & 0.29514408111572266 \\
+deepclusterv2 elevator elevator2 & 32.7 & 41.1 & 10 & 3 & 7.337968826293945 \\
+deepclusterv2 elevator elevator2 & 32.7 & 0 & 10 & 5 & 300 \\
+
+supcon elevator elevator2 & 84.6 & 90.2 & 5 & 3 & 0.030246734619140625 \\
+supcon elevator elevator2 & 84.6 & 93.8 & 5 & 5 & 0.2818019390106201 \\
+supcon elevator elevator2 & 85.1 & 93.0 & 10 & 3 & 7.1949615478515625 \\
+supcon elevator elevator2 & 85.1 & 0 & 10 & 5 & 300 \\
+
+swav elevator elevator2 & 35.4 & 26.4 & 5 & 3 & 0.030495405197143555 \\
+swav elevator elevator2 & 35.4 & 27.6 & 5 & 5 & 0.292158842086792 \\
+swav elevator elevator2 & 30.4 & 17.1 & 10 & 3 & 7.278084754943848 \\
+swav elevator elevator2 & 30.4 & 0 & 10 & 5 & 300 \\
+
+byol slide_tile slide_tile2 & 37.8 & 47.4 & 5 & 3 & 0.031188011169433594 \\
+byol slide_tile slide_tile2 & 37.8 & 47.2 & 5 & 5 & 0.30092406272888184 \\
+byol slide_tile slide_tile2 & 38.4 & 36.9 & 10 & 3 & 7.543787479400635 \\
+byol slide_tile slide_tile2 & 38.4 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 slide_tile slide_tile2 & 95.6 & 100.0 & 5 & 3 & 0.03096628189086914 \\
+deepclusterv2 slide_tile slide_tile2 & 95.6 & 100.0 & 5 & 5 & 0.30095458030700684 \\
+deepclusterv2 slide_tile slide_tile2 & 93.8 & 98.0 & 10 & 3 & 7.480464220046997 \\
+deepclusterv2 slide_tile slide_tile2 & 93.8 & 0 & 10 & 5 & 300 \\
+
+supcon slide_tile slide_tile2 & 100.0 & 100.0 & 5 & 3 & 0.031481266021728516 \\
+supcon slide_tile slide_tile2 & 100.0 & 100.0 & 5 & 5 & 0.29853296279907227 \\
+supcon slide_tile slide_tile2 & 100.0 & 100.0 & 10 & 3 & 7.405138254165649 \\
+supcon slide_tile slide_tile2 & 100.0 & 0 & 10 & 5 & 300 \\
+
+swav slide_tile slide_tile2 & 12.2 & 8.4 & 5 & 3 & 0.032187461853027344 \\
+swav slide_tile slide_tile2 & 12.2 & 3.8 & 5 & 5 & 0.3073000907897949 \\
+swav slide_tile slide_tile2 & 7.6 & 8.4 & 10 & 3 & 7.51814079284668 \\
+swav slide_tile slide_tile2 & 7.6 & 0 & 10 & 5 & 300 \\
+
+byol grid grid3 & 25.6 & 37.0 & 5 & 3 & 0.03080129623413086 \\
+byol grid grid3 & 25.6 & 46.4 & 5 & 5 & 0.2997753620147705 \\
+byol grid grid3 & 27.1 & 50.8 & 10 & 3 & 7.4224793910980225 \\
+byol grid grid3 & 27.1 & 0 & 10 & 5 & 300 \\
+
+deepclusterv2 grid grid3 & 34.2 & 48.6 & 5 & 3 & 0.030595064163208008 \\
+deepclusterv2 grid grid3 & 34.2 & 55.0 & 5 & 5 & 0.293914794921875 \\
+deepclusterv2 grid grid3 & 30.9 & 51.2 & 10 & 3 & 7.264267444610596 \\
+deepclusterv2 grid grid3 & 30.9 & 0 & 10 & 5 & 300 \\
+
+supcon grid grid3 & 100.0 & 100.0 & 5 & 3 & 0.031419992446899414 \\
+supcon grid grid3 & 100.0 & 100.0 & 5 & 5 & 0.29991626739501953 \\
+supcon grid grid3 & 97.3 & 100.0 & 10 & 3 & 7.4792444705963135 \\
+supcon grid grid3 & 97.3 & 0 & 10 & 5 & 300 \\
+
+swav grid grid3 & 13.6 & 22.8 & 5 & 3 & 0.031623125076293945 \\
+swav grid grid3 & 13.6 & 48.0 & 5 & 5 & 0.2999536991119385 \\
+swav grid grid3 & 21.5 & 40.9 & 10 & 3 & 7.571940660476685 \\
+swav grid grid3 & 21.5 & 0 & 10 & 5 & 300 \\

@@ -28,7 +28,7 @@ def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
 
 
 
-def bnb_neighbours_align(state_graph, states, preds, logits, top_n):
+def neighbours_align(state_graph, states, preds, logits, top_n):
 
     bnb_preds = []
 
