@@ -1,14 +1,14 @@
 from pddl_vis.utils import load_args
 from pddl_vis.dataset import get_domain, visualize_traces
-from pddl_vis.aligning import bnb_align, greedy_align, get_graph_and_traces, get_predictions, neighbours_align
+from pddl_vis.aligning import greedy_align, get_graph_and_traces, get_predictions, neighbours_align, top_n_align
 from solo.utils.misc import make_contiguous
 from solo.methods import METHODS
 import numpy as np
 import math
 
 
-#load_model_path = "trained_models/byol/1yhik0ge/byol-elevator-elevator1-5-128-1yhik0ge-ep=4.ckpt"
-load_model_path = "trained_models/byol/1k20okc5/byol-grid-grid2-5-256-1k20okc5-ep=4.ckpt"
+load_model_path = "trained_models/byol/1yhik0ge/byol-elevator-elevator1-5-128-1yhik0ge-ep=4.ckpt"
+#load_model_path = "trained_models/byol/1k20okc5/byol-grid-grid2-5-256-1k20okc5-ep=4.ckpt"
 
 
 def main():
@@ -33,15 +33,18 @@ def main():
 
 
     n_traces = 1
-    trace_len = 10
+    trace_len = 5
 
     # Get one long trace to break into trace_len sizes
     state_graph, traces, states, _ = get_graph_and_traces(
         domain_file, 
         problem_file, 
         n_traces=1, 
-        trace_len=n_traces * trace_len
+        trace_len=5 * trace_len
     )
+
+    traces = [traces[0][20:]]
+    states = np.array([states[0][20:]])
 
     # (1, trace_len * n_traces, *img_shape)
     data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
@@ -61,6 +64,8 @@ def main():
     # Turn logits into a probability distribution
     logits = math.e ** logits / np.sum(math.e ** logits, axis=2)[:, :, np.newaxis]
 
+    print(np.min(logits), np.max(logits))
+
 
     greedy_accuracy, top_1_in_graph, greedy_in_graph = greedy_align(
         state_graph, 
@@ -70,23 +75,13 @@ def main():
         top_n
     )
 
-    bnb_accuracy = bnb_align(
+    neighbour_accuracy = neighbours_align(
         state_graph, 
         states, 
         preds, 
         logits, 
-        top_n
+        top_n=n_states
     )
-
-    '''
-    bnb_n_accuracy = bnb_neighbours_align(
-        state_graph, 
-        states, 
-        preds, 
-        logits, 
-        top_n
-    )
-    '''
 
 if __name__ == '__main__':
 

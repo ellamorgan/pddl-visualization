@@ -1,9 +1,8 @@
 import numpy as np
-import math
 
 
 
-def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
+def find_next(seq, score, trace_logits, state_graph, best_score, best_seq, states, indiv_scores):
 
     next_nodes = list(state_graph.neighbors(seq[-1]))
     next_logits = trace_logits[len(seq)][next_nodes]
@@ -14,15 +13,24 @@ def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
 
     for ind in sorted_logit_inds:
         node = next_nodes[ind]
-        prob = math.e ** next_logits[ind]
+        prob = next_logits[ind]
 
         new_score = score * prob
 
-        if new_score >= best_score and not last_node:
-            best_score, best_seq = find_next(seq + [node], new_score, trace_logits, state_graph, best_score, best_seq)
+        #if new_score >= best_score and not last_node:
+        if not last_node:
+            best_score, best_seq = find_next(seq + [node], new_score, trace_logits, state_graph, best_score, best_seq, states, indiv_scores + [prob])
+        if last_node:
+            if (states[0] == seq + [node]).all():
+                print("\nWe found the guy, his score is", new_score)
+                print("Broken down as:", indiv_scores + [prob])
         if last_node and new_score > best_score:
             best_score = new_score
             best_seq = seq + [node]
+            print()
+            print(best_score)
+            print(best_seq)
+            print(indiv_scores + [prob])
 
     return best_score, best_seq
 
@@ -30,7 +38,7 @@ def find_next(seq, score, trace_logits, state_graph, best_score, best_seq):
 
 def neighbours_align(state_graph, states, preds, logits, top_n):
 
-    bnb_preds = []
+    neighbours_preds = []
 
     for trace_preds, trace_logits in zip(preds, logits):
 
@@ -39,23 +47,26 @@ def neighbours_align(state_graph, states, preds, logits, top_n):
 
         for first_node in trace_preds[0][:top_n]:
 
-            score = math.e ** trace_logits[0][first_node]   # This doesn't assume trace_logits is sorted
+            score = trace_logits[0][first_node]   # This doesn't assume trace_logits is sorted
 
-            score, seq = find_next([first_node], score, trace_logits, state_graph, best_score, best_seq)
+            score, seq = find_next([first_node], score, trace_logits, state_graph, best_score, best_seq, states, [score])
 
             if score > best_score:
                 best_score = score
                 best_seq = seq
         
-        bnb_preds.append(best_seq)
+        neighbours_preds.append(best_seq)
     
-    bnb_neighbours_accuracy = 100 * np.sum(np.array(bnb_preds) == states) / states.size
+    neighbours_accuracy = 100 * np.sum(np.array(neighbours_preds) == states) / states.size
 
     print()
-    print(f"BnB neighbours accuracy:  {bnb_neighbours_accuracy:.2f}%")
+    print(states)
+
+    print()
+    print(f"BnB neighbours accuracy:  {neighbours_accuracy:.2f}%")
     print()
 
-    return bnb_neighbours_accuracy
+    return neighbours_accuracy
 
 
 
