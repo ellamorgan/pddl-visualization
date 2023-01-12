@@ -4,13 +4,14 @@ from PIL import Image
 Image.MAX_IMAGE_PIXELS = 1000000000
 from io import BytesIO
 
-domain = 'hanoi'
+domain = 'elevator'
 
-for problem in ['hanoi1', 'hanoi2', 'hanoi3']:
+for problem in ['elevator2']:
 
     domain_file = 'data/pddl/' + domain + '/' + domain + '.pddl'
     problem_file = 'data/pddl/' + domain + '/problems/' + problem + '.pddl'
     img_path = 'results/state_spaces/' + domain + '_' + problem + '.jpg'
+    dot_path = "results/graph_files/" + domain + "_" + problem + ".dot"
 
     generator = StateEnumerator(dom = domain_file, prob = problem_file)
 
@@ -38,5 +39,6 @@ for problem in ['hanoi1', 'hanoi2', 'hanoi3']:
 
 
     dot_graph = nx.nx_pydot.to_pydot(state_graph)
+    dot_graph.write(dot_path)
     img = Image.open(BytesIO(dot_graph.create_png())).convert('RGB')
     img.save(img_path)

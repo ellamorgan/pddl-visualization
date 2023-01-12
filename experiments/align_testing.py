@@ -32,24 +32,26 @@ def main():
 
 
 
-    n_traces = 1
+    n_traces = 3
     trace_len = 5
 
     # Get one long trace to break into trace_len sizes
     state_graph, traces, states, _ = get_graph_and_traces(
         domain_file, 
         problem_file, 
-        n_traces=1, 
-        trace_len=5 * trace_len
+        n_traces=n_traces, 
+        trace_len=trace_len
     )
 
-    traces = [traces[0][20:]]
-    states = np.array([states[0][20:]])
+    #traces = [traces[0][20:]]
+    #states = np.array([states[0][20:]])
 
     # (1, trace_len * n_traces, *img_shape)
     data = visualize_traces(traces, vis=visualizer.visualize_state, img_size=(args.img_h, args.img_w))
 
-    preds, logits = get_predictions(model, data[0], batch_size=args.batch_size)
+    data = data.reshape(n_traces * trace_len, *data.shape[2:])
+
+    preds, logits = get_predictions(model, data, batch_size=args.batch_size)
 
     # (n_traces, trace_len, n_states)
     preds = preds.reshape((n_traces, trace_len, *preds.shape[1:]))
